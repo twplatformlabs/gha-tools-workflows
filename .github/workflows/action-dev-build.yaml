@@ -1,0 +1,238 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gh action development build
+
+# description:
+#
+# Performs the common development CI lifecycle steps for GitHub Action.
+#
+# Uses:
+#   ibiqlik/action-yamllint@v3
+#   ludeeus/action-shellcheck@2.0.0 based on koalaman/shellcheck
+#   synacktiv/action-octoscan@v1
+#
+# See inputs below for optional configuration parameters
+
+on:
+  workflow_call:
+
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: 1password vault services account token
+        required: false
+
+    inputs:
+
+      working-directory:
+        description: set working directory, Default is ./.
+        required: false
+        type: string
+        default: .
+
+      skip-yamllint:
+        description: skip yamllint scan. Default is false.
+        required: false
+        type: string
+        default: "false"
+      yamllint-file-or-dir:
+        description: enter space delimited list of files or directories to scan. Default is '.'.
+        required: false
+        type: string
+        default: "."
+      yamllint-config-file:
+        description: custom yamllint configuration file. Default is false. Default is '.yamllint'.
+        required: false
+        type: string
+        default: ""
+      yamllint-config-data:
+        description: inline custom  yamllint configuration.
+        required: false
+        type: string
+        default: ""
+      yamllint-format:
+        description: rormat for parsing output - parsable,standard,colored,github,auto. Default is parsable.
+        required: false
+        type: string
+        default: "parsable"
+      yamllint-strict:
+        description: return non-zero exit code on warnings as well as errors. Default is false.
+        required: false
+        type: string
+        default: "false"
+      yamllint-no-warnings:
+        description: output only error level problems. Default is false.
+        required: false
+        type: string
+        default: "false"
+
+      skip-shellcheck:
+        description: skip shellcheck scan. Default is false.
+        required: false
+        type: string
+        default: "false"
+      shellcheck-additional-files:
+        description: check for unusual files
+        required: false
+        type: string
+        default: ""
+      shellcheck-ignore-paths:
+        description: paths to ignore
+        required: false
+        type: string
+        default: ""
+      shellcheck-ignore-names:
+        description: specific files to ignore
+        required: false
+        type: string
+        default: ""
+      shellcheck-severity:
+        description: severity level; error, warn, info, style (default)
+        required: false
+        type: string
+        default: "style"
+      shellcheck-check-together:
+        description: If you run into SC1090/SC1091 errors you may need to tell shellcheck to check all files at once
+        required: false
+        type: string
+        default: "no"
+      shellcheck-scandir:
+        description: directory to scan
+        required: false
+        type: string
+        default: "."
+      shellcheck-format:
+        description: output format; tty (default), gcc, checkstyle, diff, json1, json, quiet
+        required: false
+        type: string
+        default: "gcc"
+      shellcheck-version:
+        description: set shellcheck version
+        required: false
+        type: string
+        default: v0.11.0
+      shellcheck-options:
+        description: pass any supported ShellCheck option or flag 
+        required: false
+        type: string
+        default: ""
+
+      skip-octoscan:
+        description: skip octoscan scan. Default is false.
+        required: false
+        type: string
+        default: "false"
+      octoscan-filter-triggers:
+        description: scan workflows specified in comma separated list - push,pull_request_target,etc. Default is 'external/allnopr'.
+        required: false
+        type: string
+        default: "external"
+      octoscan-filter-runs:
+        description: limit search for expression injection to run shell scripts only. Default is false.
+        required: false
+        type: string
+        default: "false"
+      octoscan-ignore:
+        description: regular expression matching to error messages you want to ignore. Default is false.
+        required: false
+        type: string
+        default: "false"
+      octoscan-disable_rules:
+        description: Comma delimited list of rules to disable.
+        required: false
+        type: string
+        default: ""
+      octoscan-enable-rules:
+        description: Only apply this comma delimited list of rules.
+        required: false
+        type: string
+        default: ""
+
+      after-checkout:
+        description: optionally call ./.github/actions/after-checkout after code checkout
+        required: false
+        type: string
+        default: "false"
+      before-build:
+        description: optionally call ./.github/actions/before-build before running dev build
+        required: false
+        type: string
+        default: "false"
+      after-build:
+        description: optionally call ./.github/actions/after-build after dev build
+        required: false
+        type: string
+        default: "false"
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+
+  action-dev-build:
+    name: gh action static code analysis
+    runs-on: ubuntu-latest
+
+    env:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6.0.1
+
+      - name: run custom after-checkout action
+        if: ${{ inputs.after-checkout != 'false' }}
+        uses: ./.github/actions/after-checkout
+        with:
+          flag: ${{ inputs.after-checkout }}
+
+      - name: run custom before-build action
+        if: ${{ inputs.before-build != 'false' }}
+        uses: ./.github/actions/before-build
+        with:
+          flag: ${{ inputs.before-build }}
+
+      - name: run yamllint
+        if: ${{ inputs.skip-yamllint == 'false' }}
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: ${{ inputs.yamllint-file-or-dir }}
+          config_file: ${{ inputs.yamllint-config-file }}
+          config_data: ${{ inputs.yamllint-config-data }}
+          format: ${{ inputs.yamllint-format }}
+          strict: ${{ inputs.yamllint-strict }}
+          no_warnings: ${{ inputs.yamllint-no-warnings }}
+
+      - name: run shellcheck
+        if: ${{ inputs.skip-shellcheck == 'false' }}
+        uses: ludeeus/action-shellcheck@2.0.0
+        env:
+          SHELLCHECK_OPTS: ${{ inputs.shellcheck-options }}
+        with:
+          additional_files: ${{ inputs.shellcheck-additional-files }}
+          ignore_paths: ${{ inputs.shellcheck-ignore-paths }}
+          ignore_names: ${{ inputs.shellcheck-ignore-names }}
+          severity: ${{ inputs.shellcheck-severity }}
+          check_together: ${{ inputs.shellcheck-check-together }}
+          scandir: ${{ inputs.shellcheck-scandir }}
+          format: ${{ inputs.shellcheck-format }}
+          version: ${{ inputs.shellcheck-version }}
+
+      - name: run octoscan
+        if: ${{ inputs.skip-octoscan == 'false' }}
+        uses: synacktiv/action-octoscan@v1
+        with:
+          workdir: ${{ inputs.working-directory }}
+          filter_triggers: ${{ inputs.octoscan-filter-triggers }}
+          filter_run: ${{ inputs.octoscan-filter-runs }}
+          ignore: ${{ inputs.octoscan-ignore }}
+          disable_rules: ${{ inputs.octoscan-disable-rules }}
+          enable_rules: ${{ inputs.octoscan-enable-rules }}
+
+      - name: run custom after-build action
+        if: ${{ inputs.after-build != 'false' }}
+        uses: ./.github/actions/after-build
+        with:
+          flag: ${{ inputs.after-build }}

@@ -1,0 +1,20 @@
+# yamllint disable rule:line-length
+---
+name: test after-release action
+
+description: test after-release action
+
+inputs:
+  flag:
+    description: pass after-build value to action to be usable as a flag to customize action flow
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: test message
+      shell: bash
+      run: echo "run after-release action"

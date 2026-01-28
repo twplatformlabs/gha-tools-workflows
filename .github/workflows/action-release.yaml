@@ -1,0 +1,159 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gh action release version
+
+on:
+  workflow_call:
+
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: 1password vault services account token
+        required: false
+
+    inputs:
+
+      release-discussion-category:
+        description: Start a discussion in the specified category.
+        required: false
+        type: string
+        default: ""
+      release-draft:
+        description: Save the release as a draft instead of publishing it. Default is false.
+        required: false
+        type: string
+        default: "false"
+      release-fail-on-no-commits:
+        description: Fail if there are no commits since the last release.
+        required: false
+        type: string
+        default: "false"
+      release-generate-notes:
+        description: Automatically generate title and notes for the release.
+        required: false
+        type: string
+        default: "false"
+      release-latest:
+        description: Mark this release as Latest. Default is true.
+        required: false
+        type: string
+        default: "false"
+      release-notes:
+        description: append additional information for release notes.
+        required: false
+        type: string
+        default: ""
+      release-notes-file:
+        description: read release notes from file.
+        required: false
+        type: string
+        default: ""
+      release-notes-from-tag:
+        description: automatically generate notes from annotated tag.
+        required: false
+        type: string
+        default: ""
+      release-start-tag:
+        description: tag to use as the starting point for generating release notes.
+        required: false
+        type: string
+        default: ""
+      release-prerelease:
+        description: Mark the release as a prerelease. Default is false.
+        required: false
+        type: string
+        default: "false"
+      release-target:
+        description: target branch or full commit SHA. Default [main branch].
+        required: false
+        type: string
+        default: ""
+      release-title:
+        description: release title. Default is github.ref_name.
+        required: false
+        type: string
+        default: ${{ github.ref_name }}"
+      release-verify-tag:
+        description: Abort in case the git tag doesn't already exist in the remote repository. Default is false.
+        required: false
+        type: string
+        default: "false"
+
+      release-chat-annoucement:
+        description: post message to chat channel on successful publish
+        required: false
+        type: string
+        default: "false"
+
+      before-release:
+        description: optionally call ./.github/actions/before-release before versioned action release
+        required: false
+        type: string
+        default: "false"
+      after-release:
+        description: optionally call ./.github/actions/after-release after versioned action release
+        required: false
+        type: string
+        default: "false"
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+
+  release-version:
+    name: publish semantic release version of action
+    runs-on: ubuntu-latest
+
+    env:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: run custom before-release action
+        if: ${{ inputs.before-release != 'false' }}
+        uses: ./.github/actions/before-release
+        with:
+          flag: ${{ inputs.before-release }}
+
+      - name: publish release notes from ${{ github.ref_name }}
+        uses: twplatformlabs/gha-tools-actions/gh-release-create@main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release-discussion-category: ${{ inputs.release-discussion-category }}
+          release-draft: ${{ inputs.release-draft }}
+          release-fail-on-no-commits: ${{ inputs.release-fail-on-no-commits }}
+          release-generate-notes: ${{ inputs.release-generate-notes }}
+          release-latest: ${{ inputs.release-latest }}
+          release-notes: ${{ inputs.release-notes }}
+          release-notes-file: ${{ inputs.release-notes-file }}
+          release-notes-from-tag: ${{ inputs.release-notes-from-tag }}
+          release-start-tag: ${{ inputs.release-start-tag }}
+          release-prerelease: ${{ inputs.release-prerelease }}
+          release-target: ${{ inputs.release-target }}
+          release-title: ${{ inputs.release-title }}
+          release-verify-tag: ${{ inputs.release-verify-tag }}
+
+        # run: |
+        #   gh release create "${{ github.ref_name }}" \
+        #      --repo="${{ github.repository }}" \
+        #      --title="${{ github.ref_name }} ${{ github.sha }}" \
+        #      --generate-notes --notes "Use SHA rather than tag in action reference for increased security."
+
+      # - name: post new release message
+      #   if: ${{ inputs.release-message != 'false' }}
+      #   uses: twplatformlabs/common-actions/slack-bot@main
+      #   with:
+      #     channel: lab-events
+      #     message: ${{ inputs.release-message }}
+      #     include-tag: true
+
+      - name: run custom after-release action
+        if: ${{ inputs.after-release != 'false' }}
+        uses: ./.github/actions/after-release
+        with:
+          instance: ${{ inputs.after-release }}
