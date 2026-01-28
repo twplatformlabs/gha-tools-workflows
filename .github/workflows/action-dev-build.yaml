@@ -128,15 +128,15 @@ on:
         type: string
         default: "*"
       octoscan-filter-runs:
-        description: limit search for expression injection to run shell scripts only. Default is false.
+        description: limit search for expression injection to run shell scripts only. Default is true.
         required: false
         type: string
-        default: "false"
+        default: "true"
       octoscan-ignore:
         description: regular expression matching to error messages you want to ignore. Default is false.
         required: false
         type: string
-        default: "false"
+        default: ""
       octoscan-disable_rules:
         description: Comma delimited list of rules to disable.
         required: false
