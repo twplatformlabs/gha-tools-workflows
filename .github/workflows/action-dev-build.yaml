@@ -239,7 +239,10 @@ jobs:
       
       - name: output octoscan results
         shell: bash
-        run: cat ${{ steps.octoscan.outputs.results }}
+        run: |
+          pwd
+          ls -la
+          cat ${{ steps.octoscan.outputs.results }}
 
       - name: run custom after-build action
         if: ${{ inputs.after-build != 'false' }}
