@@ -205,6 +205,11 @@ jobs:
           strict: ${{ inputs.yamllint-strict }}
           no_warnings: ${{ inputs.yamllint-no-warnings }}
 
+      - name: write a minimal bash script file so shellcheck always finds something to scan
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: echo "#!/usr/bin/env bash" > shellcheckminimummatcher.sh
+
       - name: run shellcheck
         if: ${{ inputs.skip-shellcheck == 'false' }}
         uses: ludeeus/action-shellcheck@2.0.0
