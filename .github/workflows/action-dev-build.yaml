@@ -168,6 +168,10 @@ permissions:
   contents: read
   actions: read
   security-events: write
+  id-token: write
+  issues: read
+  pull-requests: read
+  checks: read
 
 jobs:
 
@@ -226,7 +230,7 @@ jobs:
           version: ${{ inputs.shellcheck-version }}
 
       - name: Run OSSF Scorecard and print results
-        uses: ossf/scorecard-action@v2
+        uses: ossf/scorecard-action@v2.4.3
         with:
           # Do NOT upload to GitHub Security tab
           publish_results: false
