@@ -226,6 +226,7 @@ jobs:
           version: ${{ inputs.shellcheck-version }}
 
       - name: run octoscan
+        id: octoscan
         if: ${{ inputs.skip-octoscan == 'false' }}
         uses: synacktiv/action-octoscan@v1
         with:
@@ -235,6 +236,10 @@ jobs:
           ignore: ${{ inputs.octoscan-ignore }}
           disable_rules: ${{ inputs.octoscan-disable-rules }}
           enable_rules: ${{ inputs.octoscan-enable-rules }}
+      
+      - name: output octoscan results
+        shell: bash
+        run: cat ${{ steps.octoscan.outputs.results }}
 
       - name: run custom after-build action
         if: ${{ inputs.after-build != 'false' }}
