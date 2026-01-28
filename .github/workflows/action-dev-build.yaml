@@ -242,7 +242,7 @@ jobs:
         run: |
           pwd
           ls -la
-          cat ${{ steps.octoscan.outputs.results }}
+          cat octoscan.sarif
 
       - name: run custom after-build action
         if: ${{ inputs.after-build != 'false' }}
