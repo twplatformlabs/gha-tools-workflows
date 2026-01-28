@@ -225,6 +225,14 @@ jobs:
           format: ${{ inputs.shellcheck-format }}
           version: ${{ inputs.shellcheck-version }}
 
+      - name: Debug workspace
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          echo "Workflows:"
+          find .github/workflows -type f || true
+
+
       - name: run octoscan
         id: octoscan
         if: ${{ inputs.skip-octoscan == 'false' }}
