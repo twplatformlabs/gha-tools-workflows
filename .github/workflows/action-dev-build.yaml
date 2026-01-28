@@ -126,7 +126,7 @@ on:
         description: scan workflows specified in comma separated list - push,pull_request_target,etc. Default is 'external/allnopr'.
         required: false
         type: string
-        default: "external"
+        default: "*"
       octoscan-filter-runs:
         description: limit search for expression injection to run shell scripts only. Default is false.
         required: false
