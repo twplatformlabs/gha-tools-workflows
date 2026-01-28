@@ -225,13 +225,20 @@ jobs:
           format: ${{ inputs.shellcheck-format }}
           version: ${{ inputs.shellcheck-version }}
 
-      - name: Debug workspace
-        run: |
-          echo "PWD=$(pwd)"
-          ls -la
-          echo "Workflows:"
-          find .github/workflows -type f || true
+      - name: Run OSSF Scorecard and print results
+        uses: ossf/scorecard-action@v2
+        with:
+          # Do NOT upload to GitHub Security tab
+          publish_results: false
 
+          # Do NOT create SARIF
+          results_file: ""
+
+          # CLI arguments passed directly to scorecard
+          scorecard_args: >
+            --repo=${{ github.server_url }}/${{ github.repository }}
+            --format=json
+            --show-details
 
       - name: run octoscan
         id: octoscan
@@ -244,13 +251,6 @@ jobs:
           ignore: ${{ inputs.octoscan-ignore }}
           disable_rules: ${{ inputs.octoscan-disable-rules }}
           enable_rules: ${{ inputs.octoscan-enable-rules }}
-      
-      - name: output octoscan results
-        shell: bash
-        run: |
-          pwd
-          ls -la
-          cat octoscan.sarif
 
       - name: run custom after-build action
         if: ${{ inputs.after-build != 'false' }}
