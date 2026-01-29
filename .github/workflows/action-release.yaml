@@ -120,7 +120,7 @@ jobs:
           flag: ${{ inputs.before-release }}
 
       - name: publish release notes from ${{ github.ref_name }}
-        uses: twplatformlabs/gha-tools-actions/gh-release-create@main
+        uses: twplatformlabs/common-actions/gh-release-create@main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
