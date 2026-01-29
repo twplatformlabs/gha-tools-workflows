@@ -185,6 +185,17 @@ jobs:
           strict: ${{ inputs.yamllint-strict }}
           no_warnings: ${{ inputs.yamllint-no-warnings }}
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
+        with:
+          languages: "yaml"
+          queries: +security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
+        with:
+          category: "/language:all"
+
       - name: write a minimal bash script file so shellcheck always finds something to scan
         working-directory: ${{ inputs.working-directory }}
         shell: bash
