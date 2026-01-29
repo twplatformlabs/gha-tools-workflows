@@ -56,11 +56,6 @@ on:
         required: false
         type: string
         default: tty
-      hadolint-version:
-        description: install hadolint version. Default is latest.
-        required: false
-        type: string
-        default: ""
       hadolint-advanced-security:
         description: |
           Upload hadolint results to GitHub Security tab. Default is false.
@@ -68,6 +63,11 @@ on:
         required: false
         type: string
         default: "false"
+      # hadolint-version:
+      #   description: install hadolint version. Default is latest.
+      #   required: false
+      #   type: string
+      #   default: ""
 
       bake-file:
         description: Name of docker bake json file. Default is docker-bake.json.
@@ -285,8 +285,8 @@ jobs:
           config_file: ${{ inputs.hadolint-configfile }}
           error_level: ${{ inputs.hadolint-error-level }}
           output_format: ${{ inputs.hadolint-output-format }}
-          version: ${{ inputs.hadolint-version }}
           advanced_security: ${{ inputs.hadolint-advanced-security }}
+          # version: ${{ inputs.hadolint-version }} this action requires either specific version or no parameter passed
 
       # uses: twplatformlabs/gha-tools-action/hadolint@main
       # with:
