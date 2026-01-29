@@ -283,9 +283,11 @@ jobs:
           # if a config_file parameter is passed, the file  must exist
           # even if you want to use default setting else the action will fail
           # this will create a minimal file that maintains default scan options
-          if [[ ! -f ${{ inputs.hadolint-configfile }} ]]; then
-            echo "rules:" > ${{ inputs.hadolint-configfile }}
+          if [[ ! -f hadolint.yml ]]; then
+            echo "rules:" > hadolint.yml
           fi
+          ls -la
+          cat hadolint.yml
 
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
