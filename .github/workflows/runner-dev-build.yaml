@@ -1,0 +1,433 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gh runner dev build
+
+
+on:
+  workflow_call:
+
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: 1password vault services account token
+        required: false
+
+    inputs:
+
+      working-directory:
+        description: set working directory, default is ./.
+        required: false
+        type: string
+        default: "."
+
+      registry:
+        description: oci compatible registry
+        required: false
+        type: string
+        default: docker.io
+      registry-username:
+        description: oci registry username
+        required: false
+        type: string
+        default: $DOCKER_LOGIN
+      registry-password:
+        description: oci registry password
+        required: false
+        type: string
+        default: $DOCKER_PASSWORD
+
+
+      skip-hadolint:
+        description: skip hadolint scan. Default is false.
+        required: false
+        type: string
+        default: "false"
+      hadolint-configfile:
+        description: Custom hadolint config file. Default is hadolint.yml.
+        required: false
+        type: string
+        default: "hadolint.yml"
+      hadolint-error-level:
+        description: Reporting error level. Default 0 error (-1 never, 1 warning, 2 info)
+        required: false
+        type: string
+        default: "0"
+      hadolint-output-format:
+        description: hadolint output format. Default is tty.
+        required: false
+        type: string
+        default: tty
+      hadolint-version:
+        description: install hadolint version. Default is latest.
+        required: false
+        type: string
+        default: "latest"
+      hadolint-advanced-security:
+        description: |
+          Upload hadolint results to GitHub Security tab. Default is false.
+          Must set hadolint-output-format to sarif.
+        required: false
+        type: string
+        default: "false"
+
+      bake-file:
+        description: Name of docker bake json file. Default is docker-bake.json.
+        required: false
+        type: string
+        default: "docker-bake.json"
+      dockerfile-path:
+        description: path to the directory containing your Dockerfile(s)
+        required: false
+        type: string
+        default: "Dockerfile"
+      tag:
+        description: value for tag
+        required: false
+        type: string
+        default: "dev.${GITHUB_SHA:0:7}"
+      target:
+        description: bake file target to build. Default is runner.
+        required: false
+        type: string
+        default: "runners"
+      extra-build-args:
+        description: Extra flags to pass to docker build
+        required: false
+        type: string
+        default: ""
+
+
+
+
+      # image:
+      #   description: name of image
+      #   required: true
+      #   type: string
+
+
+
+      # tag-annotation:
+      #   description: additional tag configuration
+      #   required: false
+      #   type: string
+      #   default: ""
+
+
+
+      op-version:
+        description: install 1password-cli version
+        required: false
+        type: string
+        default: ""
+
+      teller-version:
+        description: install teller version
+        required: false
+        type: string
+        default: ""
+
+      vault-version:
+        description: install vault version
+        required: false
+        type: string
+        default: ""
+
+      snyk-scan:
+        description: perform snyk scan
+        required: false
+        type: string
+        default: false
+
+      snyk-version:
+        description: install snyk version
+        required: false
+        type: string
+        default: ""
+
+      snyk-severity-threshold:
+        description: snyk test reporting threshold
+        required: false
+        type: string
+        default: low
+
+      snyk-token:
+        description: snyk api-token
+        required: false
+        type: string
+        default: $SNYK_TOKEN
+
+      snyk-organization:
+        description: name of snyk organization
+        required: false
+        type: string
+        default: ""
+
+      snyk-skip-base-image:
+        description: skip performing cve scan of base image
+        required: false
+        type: string
+        default: "false"
+
+      snyk-additional-args:
+        description: additional custom command line flags
+        required: false
+        type: string
+        default: ""
+
+      bats-test:
+        description: run bats test against container
+        required: false
+        type: string
+        default: false
+
+      bats-version:
+        description: install bats version
+        required: false
+        type: string
+        default: ""
+
+      bats-run-container-name:
+        description: name for running container
+        required: false
+        type: string
+        default: container-test
+
+      bats-entry-point:
+        description: name of shell ( bash | ash | etc )
+        required: false
+        type: string
+        default: /bin/bash
+
+      bats-test-path:
+        description: name of folder with bats tests
+        required: false
+        type: string
+        default: test
+
+
+
+      dockerfile:
+        description: name of dockerfile
+        required: false
+        type: string
+        default: "Dockerfile"
+
+      # matrix-build:
+      #   description: performs matrix build using values passed
+      #   required: false
+      #   type: string
+      #   default: ""
+
+      trivy-scan:
+        description: perform trivy scan
+        required: false
+        type: string
+        default: false
+
+      trivy-version:
+        description: install trivy version
+        required: false
+        type: string
+        default: ""
+
+      trivy-severity:
+        description: trivy scan reporting threshold
+        required: false
+        type: string
+        default: "LOW,MEDIUM,HIGH,CRITICAL"
+
+      trivy-additional-args:
+        description: additional custom command line flags
+        required: false
+        type: string
+        default: ""
+
+      after-checkout:
+        description: optionally call ./.github/actions/after-checkout after code checkout
+        required: false
+        type: string
+        default: "false"
+
+      before-build:
+        description: optionally call ./.github/actions/before-build before docker build
+        required: false
+        type: string
+        default: "false"
+
+      after-build:
+        description: optionally call ./.github/actions/after-build after docker build
+        required: false
+        type: string
+        default: "false"
+
+      builder-image-version:
+        description: default is latest
+        type: string
+        required: false
+        default: "twdps/gha-container-builder:latest"
+
+jobs:
+
+  job-container-dev-release:
+    name: job-container development release workflow
+    runs-on: ubuntu-latest
+    #container: ${{ inputs.builder-image-version }}
+
+    env:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: run custom after-checkout action
+        if: ${{ inputs.after-checkout != 'false' }}
+        uses: ./.github/actions/after-checkout
+        with:
+          flag: ${{ inputs.after-checkout }}
+
+      # - name: install dev-release dependencies
+      #   uses: twplatformlabs/gha-tools-action/install@main
+      #   with:
+      #     op-version: ${{ inputs.op-version }}
+      #     teller-version: ${{ inputs.teller-version }}
+      #     vault-version: ${{ inputs.vault-version }}
+      #     snyk-version: ${{ inputs.snyk-version }}
+      #     bats-version: ${{ inputs.bats-version }}
+      #     hadolint-version: ${{ inputs.hadolint-version }}
+      #     trivy-version: ${{ inputs.trivy-version }}
+      #     grype-version: ${{ inputs.grype-version }}
+
+      - name: run custom before-build action
+        if: ${{ inputs.before-build != 'false' }}
+        uses: ./.github/actions/before-build
+        with:
+          instance: ${{ inputs.before-build }}
+
+      - name: hadolint dockerfile
+        if: ${{ inputs.skip-hadolint != 'true' }}
+        uses: jbergstroem/hadolint-gh-action@v1
+        with:
+          dockerfile: ${{ inputs.dockerfile-path }} 
+          config_file: ${{ inputs.hadolint-configfile }}
+          error_level: ${{ inputs.hadolint-error-level }}
+          output_format: ${{ inputs.hadolint-output-format }}
+          version: ${{ inputs.hadolint-version }}
+          advanced_security: ${{ inputs.hadolint-advanced-security }}
+
+        # uses: twplatformlabs/gha-tools-action/hadolint@main
+        # with:
+        #   working-directory: ${{ inputs.working-directory }}
+        #   path: ${{ inputs.path }}
+        #   dockerfile: ${{ inputs.dockerfile }}
+        #   hadolint-additional-args: ${{ inputs.hadolint-additional-args }}
+
+      - name: confirm registry credentials and access
+        uses: twplatformlabs/gha-tools-actions/confirm-registry@main
+        with:
+          registry: ${{ inputs.registry }}
+          registry-username: ${{ inputs.registry-username }}
+          registry-password: ${{ inputs.registry-password }}
+
+      # - name: set org.opencontainer creation date and version labels
+      #   if: ${{ inputs.opencontainer-labels == 'true' }}
+      #   uses: twplatformlabs/gha-tools-action/set-labels@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     path: ${{ inputs.path }}
+      #     dockerfile: ${{ inputs.dockerfile }}
+
+      - name: build container images from docker bake file
+        uses: twplatformlabs/gha-tools-action/buildx@main
+        with:
+          working-directory: ${{ inputs.working-directory }}
+          bake-file: ${{ inputs.bake-file }}
+          tag: ${{ inputs.tag}}
+          target: ${{ inputs.target }}
+          extra-build-args: ${{ inputs.extra-build-args }}
+
+
+
+      # - name: build gha container image
+      #   uses: twplatformlabs/gha-tools-action/build@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry}}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
+      #     path: ${{ inputs.path }}
+      #     dockerfile: ${{ inputs.dockerfile }}
+      #     extra-build-args: ${{ inputs.extra-build-args }}
+
+      # - name: perform snyk cve scan
+      #   if: ${{ inputs.snyk-scan == 'true' }}
+      #   uses: twplatformlabs/gha-tools-action/snyk-scan@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry}}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
+      #     dockerfile: ${{ inputs.dockerfile }}
+      #     path: ${{ inputs.path }}
+      #     snyk-severity-threshold: ${{ inputs.snyk-severity-threshold }}
+      #     snyk-organization: ${{ inputs.snyk-organization }}
+      #     snyk-token: ${{ inputs.snyk-token }}
+      #     snyk-skip-base-image: ${{ inputs.snyk-skip-base-image }}
+      #     snyk-additional-args: ${{ inputs.snyk-additional-args }}
+      #     security-scan-nofail: ${{ inputs.security-scan-nofail }}
+
+      # - name: perform trivy image scan
+      #   if: ${{ inputs.trivy-scan == 'true' }}
+      #   uses: twplatformlabs/gha-tools-action/trivy-scan@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry}}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
+      #     trivy-severity: ${{ inputs.trivy-severity }}
+      #     trivy-additional-args: ${{ inputs.trivy-additional-args }}
+      #     security-scan-nofail: ${{ inputs.security-scan-nofail }}
+
+      # - name: perform grype image scan
+      #   if: ${{ inputs.grype-scan == 'true' }}
+      #   uses: twplatformlabs/gha-tools-action/grype-scan@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry}}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
+      #     grype-severity: ${{ inputs.grype-severity }}
+      #     grype-additional-args: ${{ inputs.grype-additional-args }}
+      #     security-scan-nofail: ${{ inputs.security-scan-nofail }}
+
+      # - name: run bats test against running container
+      #   if: ${{ inputs.bats-test == 'true' }}
+      #   uses: twplatformlabs/gha-tools-action/bats-test@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry }}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
+      #     bats-run-container-name: ${{ inputs.bats-run-container-name }}
+      #     bats-entry-point: ${{ inputs.bats-entry-point }}
+      #     bats-test-path: ${{ inputs.bats-test-path }}
+
+      - name: run custom after-build action
+        if: ${{ inputs.after-build != 'false' }}
+        uses: ./.github/actions/after-build
+        with:
+          instance: ${{ inputs.after-build }}
+
+      # - name: push image to container registry
+      #   uses: twplatformlabs/gha-tools-action/push@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry}}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
