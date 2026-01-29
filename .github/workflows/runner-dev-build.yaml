@@ -45,7 +45,7 @@ on:
         description: Custom hadolint config file. Default is hadolint.yml.
         required: false
         type: string
-        default: "hadolint.yml"
+        default: ".hadolint.yaml"
       hadolint-error-level:
         description: Reporting error level. Default 0 error (-1 never, 1 warning, 2 info)
         required: false
@@ -283,11 +283,9 @@ jobs:
           # if a config_file parameter is passed, the file  must exist
           # even if you want to use default setting else the action will fail
           # this will create a minimal file that maintains default scan options
-          if [[ ! -f hadolint.yml ]]; then
-            echo "rules: {}" > hadolint.yml
+          if [[ ! -f .hadolint.yaml ]]; then
+            echo "rules: {}" > .hadolint.yaml
           fi
-          ls -la
-          cat hadolint.yml
 
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
