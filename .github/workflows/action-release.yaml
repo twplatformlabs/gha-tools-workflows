@@ -120,7 +120,7 @@ jobs:
           flag: ${{ inputs.before-release }}
 
       - name: publish release notes from ${{ github.ref_name }}
-        uses: twplatformlabs/common-actions/gh-release-create@main
+        uses: twplatformlabs/common-actions/gh-release-create@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -140,7 +140,7 @@ jobs:
 
       - name: post new release message to slack
         if: ${{ inputs.release-chat-annoucement != 'false' }}
-        uses: twplatformlabs/common-actions/slack-bot@main
+        uses: twplatformlabs/common-actions/slack-bot@v1
         with:
           channel: lab-events
           message: ${{ inputs.release-chat-annoucement }}
