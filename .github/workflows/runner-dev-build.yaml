@@ -78,7 +78,7 @@ on:
         description: path to the directory containing your Dockerfile(s)
         required: false
         type: string
-        default: "Dockerfile"
+        default: "./Dockerfile"
       tag:
         description: value for tag
         required: false
