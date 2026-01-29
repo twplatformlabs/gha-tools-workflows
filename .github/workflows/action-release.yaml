@@ -34,7 +34,7 @@ on:
         type: string
         default: "false"
       release-latest:
-        description: Mark this release as Latest. Default is true.
+        description: Mark this release as Latest. Default is false.
         required: false
         type: string
         default: "false"
@@ -72,7 +72,7 @@ on:
         description: release title. Default is github.ref_name.
         required: false
         type: string
-        default: ${{ github.ref_name }}"
+        default: ${{ github.ref_name }}
       release-verify-tag:
         description: Abort in case the git tag doesn't already exist in the remote repository. Default is false.
         required: false
