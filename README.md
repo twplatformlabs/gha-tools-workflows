@@ -20,3 +20,10 @@ Workflows for lifecycle management of GitHub Actions, Worksflows, and Runners
 	<img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ThoughtWorks-DPS/gha-tools-action/.github%2Fworkflows%2Fdevelopment-build.yaml"> <img alt="GitHub Release" src="https://img.shields.io/github/v/release/ThoughtWorks-DPS/gha-tools-action"> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 	</p>
 </div>
+
+
+
+
+### workflows/ossf-scorecard
+
+Checks for the presence of the `.github/workflows/ossf-scorecard.yaml` workflow in the repository. to your Action repository to keep the local code-scanning security results current.
