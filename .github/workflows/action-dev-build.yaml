@@ -112,7 +112,7 @@ on:
         type: string
         default: v0.11.0
       shellcheck-options:
-        description: pass any supported ShellCheck option or flag 
+        description: pass any supported ShellCheck option or flag
         required: false
         type: string
         default: ""
