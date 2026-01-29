@@ -8,9 +8,10 @@ name: gh action development build
 # Performs the common development CI lifecycle steps for GitHub Action.
 #
 # Uses:
-#   ibiqlik/action-yamllint@v3
-#   ludeeus/action-shellcheck@2.0.0 based on koalaman/shellcheck
-#   synacktiv/action-octoscan@v1
+#   ibiqlik/action-yamllint
+#   ludeeus/action-shellcheck (based on koalaman/shellcheck)
+#   github/codeql-action
+#   ossf/scorecard-action
 #
 # See inputs below for optional configuration parameters
 

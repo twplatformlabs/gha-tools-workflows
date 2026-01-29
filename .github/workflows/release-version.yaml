@@ -25,4 +25,4 @@ jobs:
     with:
       before-release: "true"
       release-generate-notes: "true"
-      release-chat-annoucement: "New release of twplatformlabs/common-actions"
+      release-chat-annoucement: "New release of twplatformlabs/gha-tools-workflows"

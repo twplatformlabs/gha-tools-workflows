@@ -3,6 +3,13 @@
 ---
 name: gh action release version
 
+# description:
+#
+# Create a GitHub release based on applying a semantic tag and
+# optionally posts an announcement on a Slack channel.
+#
+# See inputs below for optional configuration parameters
+
 on:
   workflow_call:
 
