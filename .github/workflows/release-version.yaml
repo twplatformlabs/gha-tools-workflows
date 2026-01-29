@@ -1,0 +1,28 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gha-tools-workflows release
+
+on:
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v[0-9]*.[0-9]*.[0-9]*"
+      - "v[0-9]*.[0-9]*.[0-9]*-rc"
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+
+  release-version:
+    name: release version
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/action-release.yaml@main
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+    with:
+      before-release: "true"
+      release-generate-notes: "true"
+      release-chat-annoucement: "New release of twplatformlabs/common-actions"
