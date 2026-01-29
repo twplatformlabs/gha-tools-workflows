@@ -36,7 +36,6 @@ on:
         type: string
         default: $DOCKER_PASSWORD
 
-
       skip-hadolint:
         description: skip hadolint scan. Default is false.
         required: false
@@ -95,24 +94,6 @@ on:
         required: false
         type: string
         default: ""
-
-
-
-
-      # image:
-      #   description: name of image
-      #   required: true
-      #   type: string
-
-
-
-      # tag-annotation:
-      #   description: additional tag configuration
-      #   required: false
-      #   type: string
-      #   default: ""
-
-
 
       op-version:
         description: install 1password-cli version
@@ -204,19 +185,11 @@ on:
         type: string
         default: test
 
-
-
       dockerfile:
         description: name of dockerfile
         required: false
         type: string
         default: "Dockerfile"
-
-      # matrix-build:
-      #   description: performs matrix build using values passed
-      #   required: false
-      #   type: string
-      #   default: ""
 
       trivy-scan:
         description: perform trivy scan
@@ -271,7 +244,7 @@ jobs:
   job-container-dev-release:
     name: job-container development release workflow
     runs-on: ubuntu-latest
-    #container: ${{ inputs.builder-image-version }}
+    # container: ${{ inputs.builder-image-version }}
 
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -308,19 +281,19 @@ jobs:
         if: ${{ inputs.skip-hadolint != 'true' }}
         uses: jbergstroem/hadolint-gh-action@v1
         with:
-          dockerfile: ${{ inputs.dockerfile-path }} 
+          dockerfile: ${{ inputs.dockerfile-path }}
           config_file: ${{ inputs.hadolint-configfile }}
           error_level: ${{ inputs.hadolint-error-level }}
           output_format: ${{ inputs.hadolint-output-format }}
           version: ${{ inputs.hadolint-version }}
           advanced_security: ${{ inputs.hadolint-advanced-security }}
 
-        # uses: twplatformlabs/gha-tools-action/hadolint@main
-        # with:
-        #   working-directory: ${{ inputs.working-directory }}
-        #   path: ${{ inputs.path }}
-        #   dockerfile: ${{ inputs.dockerfile }}
-        #   hadolint-additional-args: ${{ inputs.hadolint-additional-args }}
+      # uses: twplatformlabs/gha-tools-action/hadolint@main
+      # with:
+      #   working-directory: ${{ inputs.working-directory }}
+      #   path: ${{ inputs.path }}
+      #   dockerfile: ${{ inputs.dockerfile }}
+      #   hadolint-additional-args: ${{ inputs.hadolint-additional-args }}
 
       - name: confirm registry credentials and access
         uses: twplatformlabs/gha-tools-actions/confirm-registry@main
@@ -345,8 +318,6 @@ jobs:
           tag: ${{ inputs.tag}}
           target: ${{ inputs.target }}
           extra-build-args: ${{ inputs.extra-build-args }}
-
-
 
       # - name: build gha container image
       #   uses: twplatformlabs/gha-tools-action/build@main
