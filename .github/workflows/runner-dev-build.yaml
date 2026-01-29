@@ -275,7 +275,7 @@ jobs:
         if: ${{ inputs.before-build != 'false' }}
         uses: ./.github/actions/before-build
         with:
-          instance: ${{ inputs.before-build }}
+          flag: ${{ inputs.before-build }}
 
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
@@ -392,7 +392,7 @@ jobs:
         if: ${{ inputs.after-build != 'false' }}
         uses: ./.github/actions/after-build
         with:
-          instance: ${{ inputs.after-build }}
+          flag: ${{ inputs.after-build }}
 
       # - name: push image to container registry
       #   uses: twplatformlabs/gha-tools-action/push@main
