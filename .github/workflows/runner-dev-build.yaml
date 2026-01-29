@@ -60,7 +60,7 @@ on:
         description: install hadolint version. Default is latest.
         required: false
         type: string
-        default: "latest"
+        default: ""
       hadolint-advanced-security:
         description: |
           Upload hadolint results to GitHub Security tab. Default is false.
