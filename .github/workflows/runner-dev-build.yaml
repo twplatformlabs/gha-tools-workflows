@@ -311,7 +311,7 @@ jobs:
       #     dockerfile: ${{ inputs.dockerfile }}
 
       - name: build container images from docker bake file
-        uses: twplatformlabs/gha-tools-action/buildx@main
+        uses: twplatformlabs/gha-tools-actions/buildx@main
         with:
           working-directory: ${{ inputs.working-directory }}
           bake-file: ${{ inputs.bake-file }}
