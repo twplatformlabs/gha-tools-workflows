@@ -117,36 +117,16 @@ on:
         type: string
         default: ""
 
-      skip-octoscan:
-        description: skip octoscan scan. Default is false.
+      skip-scorecard-check:
+        description: skip checking for existence of ossf-scorecard workflow. Default is false.
         required: false
         type: string
         default: "false"
-      octoscan-filter-triggers:
-        description: scan workflows specified in comma separated list - push,pull_request_target,etc. Default is 'external/allnopr'.
+      scorecard-filename:
+        description: ossf-scorecard workflow filename. Default is ossf-scorecard.yaml.
         required: false
         type: string
-        default: "*"
-      octoscan-filter-runs:
-        description: limit search for expression injection to run shell scripts only. Default is true.
-        required: false
-        type: string
-        default: "true"
-      octoscan-ignore:
-        description: regular expression matching to error messages you want to ignore. Default is false.
-        required: false
-        type: string
-        default: ""
-      octoscan-disable_rules:
-        description: Comma delimited list of rules to disable.
-        required: false
-        type: string
-        default: ""
-      octoscan-enable-rules:
-        description: Only apply this comma delimited list of rules.
-        required: false
-        type: string
-        default: ""
+        default: "ossf-scorecard.yaml"
 
       after-checkout:
         description: optionally call ./.github/actions/after-checkout after code checkout
@@ -168,10 +148,6 @@ permissions:
   contents: read
   actions: read
   security-events: write
-  id-token: write
-  issues: read
-  pull-requests: read
-  checks: read
 
 jobs:
 
@@ -229,32 +205,14 @@ jobs:
           format: ${{ inputs.shellcheck-format }}
           version: ${{ inputs.shellcheck-version }}
 
-      - name: Run OSSF Scorecard and print results
-        uses: ossf/scorecard-action@v2.4.3
-        with:
-          # Do NOT upload to GitHub Security tab
-          publish_results: false
-
-          # Do NOT create SARIF
-          results_file: ""
-
-          # CLI arguments passed directly to scorecard
-          scorecard_args: >
-            --repo=${{ github.server_url }}/${{ github.repository }}
-            --format=json
-            --show-details
-
-      - name: run octoscan
-        id: octoscan
-        if: ${{ inputs.skip-octoscan == 'false' }}
-        uses: synacktiv/action-octoscan@v1
-        with:
-          workdir: ${{ inputs.working-directory }}
-          filter_triggers: ${{ inputs.octoscan-filter-triggers }}
-          filter_run: ${{ inputs.octoscan-filter-runs }}
-          ignore: ${{ inputs.octoscan-ignore }}
-          disable_rules: ${{ inputs.octoscan-disable-rules }}
-          enable_rules: ${{ inputs.octoscan-enable-rules }}
+      - name: confirm ossf-scorecard workflow exists
+        if: ${{ inputs.skip-scorecard-check == 'false' }}
+        shell: bash
+        run: |
+          if [[ ! -f ".github/workflows/${{ inputs.scorecard-filename" }} ]]; then
+            echo "ossf-scorecard workflow does not exist"
+            exit 1
+          fi
 
       - name: run custom after-build action
         if: ${{ inputs.after-build != 'false' }}
