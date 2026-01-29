@@ -63,11 +63,11 @@ on:
         required: false
         type: string
         default: "false"
-      # hadolint-version:
-      #   description: install hadolint version. Default is latest.
-      #   required: false
-      #   type: string
-      #   default: ""
+      hadolint-version:
+        description: install hadolint version. Default is latest.
+        required: false
+        type: string
+        default: "2.14.0"
 
       bake-file:
         description: Name of docker bake json file. Default is docker-bake.json.
@@ -277,16 +277,32 @@ jobs:
         with:
           flag: ${{ inputs.before-build }}
 
+      - name: enable default hadolint config file options
+        shell: bash
+        run: |
+          # if a config_file parameter is passed, the file  must exist
+          # even if you want to use default setting else the action will fail
+          # this will create a minimal file that maintains default scan options
+          if [[ ! -f ${{ inputs.hadolint-configfile }} ]]; then
+            echo "rules:" > ${{ inputs.hadolint-configfile }}
+          fi
+
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
         uses: jbergstroem/hadolint-gh-action@v1
         with:
           dockerfile: ${{ inputs.dockerfile-path }}
-          config_file: ${{ inputs.hadolint-configfile }}
           error_level: ${{ inputs.hadolint-error-level }}
           output_format: ${{ inputs.hadolint-output-format }}
           advanced_security: ${{ inputs.hadolint-advanced-security }}
-          # version: ${{ inputs.hadolint-version }} this action requires either specific version or no parameter passed
+          version: ${{ inputs.hadolint-version }}
+          config_file: ${{ inputs.hadolint-configfile }}
+          # these parameters are available in the Action, however
+          # they do not support passing emptry string or null values
+          # to indicate using the default. If they are passed they
+          # must be set.
+          # config_file: ${{ inputs.hadolint-configfile }}
+          # version: ${{ inputs.hadolint-version }}
 
       # uses: twplatformlabs/gha-tools-action/hadolint@main
       # with:
