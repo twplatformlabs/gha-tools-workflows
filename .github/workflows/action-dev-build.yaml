@@ -209,7 +209,7 @@ jobs:
         if: ${{ inputs.skip-scorecard-check == 'false' }}
         shell: bash
         run: |
-          if [[ ! -f ".github/workflows/${{ inputs.scorecard-filename" }} ]]; then
+          if [[ ! -f ".github/workflows/${{ inputs.scorecard-filename }}" ]]; then
             echo "ossf-scorecard workflow does not exist"
             exit 1
           fi
