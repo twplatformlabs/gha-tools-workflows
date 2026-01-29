@@ -284,7 +284,7 @@ jobs:
           # even if you want to use default setting else the action will fail
           # this will create a minimal file that maintains default scan options
           if [[ ! -f hadolint.yml ]]; then
-            echo "rules:" > hadolint.yml
+            echo "rules: {}" > hadolint.yml
           fi
           ls -la
           cat hadolint.yml
