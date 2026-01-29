@@ -144,7 +144,7 @@ jobs:
         with:
           channel: lab-events
           message: ${{ inputs.release-chat-annoucement }}
-          include-list: true
+          include-link: true
           include-tag: true
 
       - name: run custom after-release action
