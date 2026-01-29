@@ -19,7 +19,7 @@ jobs:
 
   release-version:
     name: release version
-    uses: twplatformlabs/gha-tools-workflows/.github/workflows/action-release.yaml@main
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/action-release.yaml@v1
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
     with:
