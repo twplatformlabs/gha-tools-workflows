@@ -296,7 +296,7 @@ jobs:
           advanced_security: ${{ inputs.hadolint-advanced-security }}
           version: ${{ inputs.hadolint-version }}
           config_file: ${{ inputs.hadolint-configfile }}
-          # dockerfile: ${{ inputs.dockerfile-path }}
+          dockerfile: .
           # these parameters are available in the Action, however
           # they do not support passing emptry string or null values
           # to indicate using the default. If they are passed they
