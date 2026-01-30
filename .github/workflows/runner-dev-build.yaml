@@ -29,12 +29,10 @@ on:
         description: oci registry username
         required: false
         type: string
-        default: $DOCKER_LOGIN
       registry-password:
         description: oci registry password
         required: false
         type: string
-        default: $DOCKER_PASSWORD
 
       dockerfile:
         description: path to the directory containing your Dockerfile(s)
