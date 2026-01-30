@@ -36,49 +36,63 @@ on:
         type: string
         default: $DOCKER_PASSWORD
 
+      dockerfile:
+        description: path to the directory containing your Dockerfile(s)
+        required: false
+        type: string
+        default: "./Dockerfile"
+
       skip-hadolint:
         description: skip hadolint scan. Default is false.
         required: false
         type: string
         default: "false"
-      hadolint-configfile:
-        description: Custom hadolint config file. Default is hadolint.yml.
+      hadolint-config:
+        description: Custom hadolint config file.
         required: false
         type: string
-        default: ".hadolint.yaml"
-      hadolint-error-level:
-        description: Reporting error level. Default 0 error (-1 never, 1 warning, 2 info)
-        required: false
-        type: string
-        default: "0"
-      hadolint-output-format:
-        description: hadolint output format. Default is tty.
-        required: false
-        type: string
-        default: tty
-      hadolint-advanced-security:
-        description: |
-          Upload hadolint results to GitHub Security tab. Default is false.
-          Must set hadolint-output-format to sarif.
+        default: ""
+      hadolint-verbose:
+        description: verbose output. Default is false.
         required: false
         type: string
         default: "false"
-      hadolint-version:
-        description: install hadolint version. Default is latest.
+      hadolint-failure-threshold:
+        description: Reporting error level. Default is info (error, warning, style, ignore) 
         required: false
         type: string
-        default: "2.14.0"
+        default: "info"
+      hadolint-format:
+        description: hadolint output format. Default is tty.
+        required: false
+        type: string
+        default: "tty"
+      hadolint-output-file:
+        description: pipe output to file. Default is /dev/stdout.
+        required: false
+        type: string
+        default: "/dev/stdout"
+      hadolint-ignore:
+        description: comma delimited list of Hadolint rules to ignore.
+        required: false
+        type: string
+        default: ""
+      hadolint-no-fail:
+        description: don't fail on errors. Default is false.
+        required: false
+        type: string
+        default: "false"
+      hadolint-trusted-registries:
+        description: comma delimited list of trusted registries.
+        required: false
+        type: string
+        default: ""
 
       bake-file:
         description: Name of docker bake json file. Default is docker-bake.json.
         required: false
         type: string
         default: "docker-bake.json"
-      dockerfile-path:
-        description: path to the directory containing your Dockerfile(s)
-        required: false
-        type: string
-        default: "./Dockerfile"
       tag:
         description: value for tag
         required: false
@@ -185,11 +199,7 @@ on:
         type: string
         default: test
 
-      dockerfile:
-        description: name of dockerfile
-        required: false
-        type: string
-        default: "Dockerfile"
+
 
       trivy-scan:
         description: perform trivy scan
@@ -277,32 +287,29 @@ jobs:
         with:
           flag: ${{ inputs.before-build }}
 
-      - name: enable default hadolint config file options
-        shell: bash
-        run: |
-          # if a config_file parameter is passed, the file  must exist
-          # even if you want to use default setting else the action will fail
-          # this will create a minimal file that maintains default scan options
-          if [[ ! -f .hadolint.yaml ]]; then
-            echo "rules: {}" > .hadolint.yaml
-          fi
+      # - name: enable default hadolint config file options
+      #   shell: bash
+      #   run: |
+      #     # if a config_file parameter is passed, the file  must exist
+      #     # even if you want to use default setting else the action will fail
+      #     # this will create a minimal file that maintains default scan options
+      #     if [[ ! -f .hadolint.yaml ]]; then
+      #       echo "rules: {}" > .hadolint.yaml
+      #     fi
 
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
-        uses: jbergstroem/hadolint-gh-action@v1
+        uses: hadolint/hadolint-action@v3.3.0
         with:
-          error_level: ${{ inputs.hadolint-error-level }}
-          output_format: ${{ inputs.hadolint-output-format }}
-          advanced_security: ${{ inputs.hadolint-advanced-security }}
-          version: ${{ inputs.hadolint-version }}
-          config_file: ${{ inputs.hadolint-configfile }}
-          dockerfile: .
-          # these parameters are available in the Action, however
-          # they do not support passing emptry string or null values
-          # to indicate using the default. If they are passed they
-          # must be set.
-          # config_file: ${{ inputs.hadolint-configfile }}
-          # version: ${{ inputs.hadolint-version }}
+          dockerfile: ${{ inputs.dockerfile }}
+          config: ${{ inputs.hadolint-config }}
+          verbose: ${{ inputs.hadolint-verbose }}
+          output-file: ${{ inputs.hadolint-output-file }}
+          format: ${{ inputs.hadolint-format }}
+          failure-threshold: ${{ inputs.hadolint-failure-threshold }}
+          no-fail: ${{ inputs.hadolint-no-fail }}
+          ignore: ${{ inputs.hadolint-ignore }}
+          trusted-registries: ${{ inputs.hadolint-trusted-registries }}
 
       # uses: twplatformlabs/gha-tools-action/hadolint@main
       # with:
