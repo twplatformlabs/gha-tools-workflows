@@ -241,7 +241,7 @@ on:
 
 jobs:
 
-  job-container-dev-release:
+  runner-dev-release:
     name: job-container development release workflow
     runs-on: ubuntu-latest
     # container: ${{ inputs.builder-image-version }}
@@ -291,12 +291,12 @@ jobs:
         if: ${{ inputs.skip-hadolint != 'true' }}
         uses: jbergstroem/hadolint-gh-action@v1
         with:
-          dockerfile: ${{ inputs.dockerfile-path }}
           error_level: ${{ inputs.hadolint-error-level }}
           output_format: ${{ inputs.hadolint-output-format }}
           advanced_security: ${{ inputs.hadolint-advanced-security }}
           version: ${{ inputs.hadolint-version }}
           config_file: ${{ inputs.hadolint-configfile }}
+          # dockerfile: ${{ inputs.dockerfile-path }}
           # these parameters are available in the Action, however
           # they do not support passing emptry string or null values
           # to indicate using the default. If they are passed they
