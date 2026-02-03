@@ -10,9 +10,11 @@ name: gh runner dev build
 # Uses:
 #   hadolint/hadolint-action
 #   twplatformlabs/gha-tools-actions/buildx (using bake file confiuration)
-#   github/codeql-action
+#   twplatformlabs/gha-tools-actions/scout-scan (Docker Scout cve scan)
 #   ossf/scorecard-action
 #
+# Use before-build local Action to setup ENV values,
+# both pulled from a secrets store and for use in bake file.
 # See inputs below for optional configuration parameters
 
 on:
@@ -104,6 +106,32 @@ on:
         type: string
         default: ""
 
+      bats-test:
+        description: run bats test against container
+        required: false
+        type: string
+        default: false
+      bats-version:
+        description: install bats version
+        required: false
+        type: string
+        default: ""
+      bats-run-container-name:
+        description: name for running container
+        required: false
+        type: string
+        default: container-test
+      bats-entry-point:
+        description: name of shell ( bash | ash | etc )
+        required: false
+        type: string
+        default: /bin/bash
+      bats-test-path:
+        description: name of folder with bats tests
+        required: false
+        type: string
+        default: test
+
       op-version:
         description: install 1password-cli version
         required: false
@@ -118,6 +146,12 @@ on:
 
       vault-version:
         description: install vault version
+        required: false
+        type: string
+        default: ""
+
+      scout-version:
+        description: install docker scout version
         required: false
         type: string
         default: ""
@@ -163,38 +197,6 @@ on:
         required: false
         type: string
         default: ""
-
-      bats-test:
-        description: run bats test against container
-        required: false
-        type: string
-        default: false
-
-      bats-version:
-        description: install bats version
-        required: false
-        type: string
-        default: ""
-
-      bats-run-container-name:
-        description: name for running container
-        required: false
-        type: string
-        default: container-test
-
-      bats-entry-point:
-        description: name of shell ( bash | ash | etc )
-        required: false
-        type: string
-        default: /bin/bash
-
-      bats-test-path:
-        description: name of folder with bats tests
-        required: false
-        type: string
-        default: test
-
-
 
       trivy-scan:
         description: perform trivy scan
@@ -247,7 +249,7 @@ on:
 jobs:
 
   runner-dev-release:
-    name: job-container development release workflow
+    name: runner development build workflow
     runs-on: ubuntu-latest
     # container: ${{ inputs.builder-image-version }}
 
@@ -264,17 +266,18 @@ jobs:
         with:
           flag: ${{ inputs.after-checkout }}
 
-      # - name: install dev-release dependencies
-      #   uses: twplatformlabs/gha-tools-action/install@main
-      #   with:
-      #     op-version: ${{ inputs.op-version }}
-      #     teller-version: ${{ inputs.teller-version }}
-      #     vault-version: ${{ inputs.vault-version }}
-      #     snyk-version: ${{ inputs.snyk-version }}
-      #     bats-version: ${{ inputs.bats-version }}
-      #     hadolint-version: ${{ inputs.hadolint-version }}
-      #     trivy-version: ${{ inputs.trivy-version }}
-      #     grype-version: ${{ inputs.grype-version }}
+      - name: install dev-release dependencies
+        uses: twplatformlabs/gha-tools-actions/install@main
+        with:
+          scout-version: ${{ inputs.scout-version }}
+          # op-version: ${{ inputs.op-version }}
+          # teller-version: ${{ inputs.teller-version }}
+          # vault-version: ${{ inputs.vault-version }}
+          # snyk-version: ${{ inputs.snyk-version }}
+          # bats-version: ${{ inputs.bats-version }}
+          # hadolint-version: ${{ inputs.hadolint-version }}
+          # trivy-version: ${{ inputs.trivy-version }}
+          # grype-version: ${{ inputs.grype-version }}
 
       - name: run custom before-build action
         if: ${{ inputs.before-build != 'false' }}
@@ -311,14 +314,11 @@ jobs:
 
       # - name: run bats test against running container
       #   if: ${{ inputs.bats-test == 'true' }}
-      #   uses: twplatformlabs/gha-tools-action/bats-test@main
+      #   uses: twplatformlabs/gha-tools-actions/bats@main
       #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry }}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
-      #     bats-run-container-name: ${{ inputs.bats-run-container-name }}
+      #     bake-file: ${{ inputs.bake-file }}
+      #     tag: ${{ inputs.tag}}
+      #     target: ${{ inputs.target }}
       #     bats-entry-point: ${{ inputs.bats-entry-point }}
       #     bats-test-path: ${{ inputs.bats-test-path }}
 
