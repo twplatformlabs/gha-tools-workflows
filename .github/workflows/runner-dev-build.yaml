@@ -81,7 +81,7 @@ on:
         description: value for tag
         required: false
         type: string
-        default: "dev.${GITHUB_SHA:0:7}"
+        default: ""
       target:
         description: bake file target to build. Default is runner.
         required: false
@@ -271,16 +271,6 @@ jobs:
         with:
           flag: ${{ inputs.before-build }}
 
-      # - name: enable default hadolint config file options
-      #   shell: bash
-      #   run: |
-      #     # if a config_file parameter is passed, the file  must exist
-      #     # even if you want to use default setting else the action will fail
-      #     # this will create a minimal file that maintains default scan options
-      #     if [[ ! -f .hadolint.yaml ]]; then
-      #       echo "rules: {}" > .hadolint.yaml
-      #     fi
-
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
         uses: hadolint/hadolint-action@v3.3.0
@@ -294,13 +284,6 @@ jobs:
           no-fail: ${{ inputs.hadolint-no-fail }}
           ignore: ${{ inputs.hadolint-ignore }}
           trusted-registries: ${{ inputs.hadolint-trusted-registries }}
-
-      # uses: twplatformlabs/gha-tools-action/hadolint@main
-      # with:
-      #   working-directory: ${{ inputs.working-directory }}
-      #   path: ${{ inputs.path }}
-      #   dockerfile: ${{ inputs.dockerfile }}
-      #   hadolint-additional-args: ${{ inputs.hadolint-additional-args }}
 
       - name: confirm registry credentials and access
         uses: twplatformlabs/gha-tools-actions/confirm-registry@main
@@ -323,17 +306,7 @@ jobs:
           target: ${{ inputs.target }}
           extra-build-args: ${{ inputs.extra-build-args }}
 
-      # - name: build gha container image
-      #   uses: twplatformlabs/gha-tools-action/build@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry}}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
-      #     path: ${{ inputs.path }}
-      #     dockerfile: ${{ inputs.dockerfile }}
-      #     extra-build-args: ${{ inputs.extra-build-args }}
+
 
       # - name: perform snyk cve scan
       #   if: ${{ inputs.snyk-scan == 'true' }}
