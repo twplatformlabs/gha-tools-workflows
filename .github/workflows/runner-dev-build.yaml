@@ -25,14 +25,6 @@ on:
         required: false
         type: string
         default: docker.io
-      registry-username:
-        description: oci registry username
-        required: false
-        type: string
-      registry-password:
-        description: oci registry password
-        required: false
-        type: string
 
       dockerfile:
         description: path to the directory containing your Dockerfile(s)
@@ -320,8 +312,6 @@ jobs:
         uses: twplatformlabs/gha-tools-actions/confirm-registry@main
         with:
           registry: ${{ inputs.registry }}
-          registry-username: ${{ inputs.registry-username }}
-          registry-password: ${{ inputs.registry-password }}
 
       # - name: set org.opencontainer creation date and version labels
       #   if: ${{ inputs.opencontainer-labels == 'true' }}
