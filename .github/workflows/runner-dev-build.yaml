@@ -3,6 +3,17 @@
 ---
 name: gh runner dev build
 
+# description:
+#
+# Performs the common development CI lifecycle steps for building pre-configured GitHub Action runners.
+#
+# Uses:
+#   hadolint/hadolint-action
+#   twplatformlabs/gha-tools-actions/buildx (using bake file confiuration)
+#   github/codeql-action
+#   ossf/scorecard-action
+#
+# See inputs below for optional configuration parameters
 
 on:
   workflow_call:
@@ -290,14 +301,6 @@ jobs:
         with:
           registry: ${{ inputs.registry }}
 
-      # - name: set org.opencontainer creation date and version labels
-      #   if: ${{ inputs.opencontainer-labels == 'true' }}
-      #   uses: twplatformlabs/gha-tools-action/set-labels@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     path: ${{ inputs.path }}
-      #     dockerfile: ${{ inputs.dockerfile }}
-
       - name: build container images from docker bake file
         uses: twplatformlabs/gha-tools-actions/buildx@main
         with:
@@ -306,7 +309,25 @@ jobs:
           target: ${{ inputs.target }}
           extra-build-args: ${{ inputs.extra-build-args }}
 
+      # - name: run bats test against running container
+      #   if: ${{ inputs.bats-test == 'true' }}
+      #   uses: twplatformlabs/gha-tools-action/bats-test@main
+      #   with:
+      #     working-directory: ${{ inputs.working-directory }}
+      #     registry: ${{ inputs.registry }}
+      #     organization: ${{ inputs.organization }}
+      #     image: ${{ inputs.image }}
+      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
+      #     bats-run-container-name: ${{ inputs.bats-run-container-name }}
+      #     bats-entry-point: ${{ inputs.bats-entry-point }}
+      #     bats-test-path: ${{ inputs.bats-test-path }}
 
+      - name: cve scan container images from docker bake file
+        uses: twplatformlabs/gha-tools-actions/scout-scan@main
+        with:
+          bake-file: ${{ inputs.bake-file }}
+          tag: ${{ inputs.tag}}
+          target: ${{ inputs.target }}
 
       # - name: perform snyk cve scan
       #   if: ${{ inputs.snyk-scan == 'true' }}
@@ -370,12 +391,3 @@ jobs:
         uses: ./.github/actions/after-build
         with:
           flag: ${{ inputs.after-build }}
-
-      # - name: push image to container registry
-      #   uses: twplatformlabs/gha-tools-action/push@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry}}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
