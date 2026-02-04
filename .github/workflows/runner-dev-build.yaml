@@ -167,30 +167,6 @@ on:
         type: string
         default: ""
 
-      trivy-scan:
-        description: perform trivy scan
-        required: false
-        type: string
-        default: false
-
-      trivy-version:
-        description: install trivy version
-        required: false
-        type: string
-        default: ""
-
-      trivy-severity:
-        description: trivy scan reporting threshold
-        required: false
-        type: string
-        default: "LOW,MEDIUM,HIGH,CRITICAL"
-
-      trivy-additional-args:
-        description: additional custom command line flags
-        required: false
-        type: string
-        default: ""
-
       after-checkout:
         description: optionally call ./.github/actions/after-checkout after code checkout
         required: false
@@ -238,14 +214,12 @@ jobs:
       - name: install dev-release dependencies
         uses: twplatformlabs/gha-tools-actions/install@main
         with:
+          op-version: ${{ inputs.op-version }}
+          teller-version: ${{ inputs.teller-version }}
+          vault-version: ${{ inputs.vault-version }}
           scout-version: ${{ inputs.scout-version }}
-          # op-version: ${{ inputs.op-version }}
-          # teller-version: ${{ inputs.teller-version }}
-          # vault-version: ${{ inputs.vault-version }}
-          # snyk-version: ${{ inputs.snyk-version }}
+          snyk-version: ${{ inputs.snyk-version }}
           # bats-version: ${{ inputs.bats-version }}
-          # trivy-version: ${{ inputs.trivy-version }}
-          # grype-version: ${{ inputs.grype-version }}
 
       - name: run custom before-build action
         if: ${{ inputs.before-build != 'false' }}
@@ -304,45 +278,6 @@ jobs:
           bake-file: ${{ inputs.bake-file }}
           tag: ${{ inputs.tag}}
           target: ${{ inputs.target }}
-
-      # - name: perform trivy image scan
-      #   if: ${{ inputs.trivy-scan == 'true' }}
-      #   uses: twplatformlabs/gha-tools-action/trivy-scan@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry}}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
-      #     trivy-severity: ${{ inputs.trivy-severity }}
-      #     trivy-additional-args: ${{ inputs.trivy-additional-args }}
-      #     security-scan-nofail: ${{ inputs.security-scan-nofail }}
-
-      # - name: perform grype image scan
-      #   if: ${{ inputs.grype-scan == 'true' }}
-      #   uses: twplatformlabs/gha-tools-action/grype-scan@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry}}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
-      #     grype-severity: ${{ inputs.grype-severity }}
-      #     grype-additional-args: ${{ inputs.grype-additional-args }}
-      #     security-scan-nofail: ${{ inputs.security-scan-nofail }}
-
-      # - name: run bats test against running container
-      #   if: ${{ inputs.bats-test == 'true' }}
-      #   uses: twplatformlabs/gha-tools-action/bats-test@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry }}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
-      #     bats-run-container-name: ${{ inputs.bats-run-container-name }}
-      #     bats-entry-point: ${{ inputs.bats-entry-point }}
-      #     bats-test-path: ${{ inputs.bats-test-path }}
 
       - name: run custom after-build action
         if: ${{ inputs.after-build != 'false' }}
