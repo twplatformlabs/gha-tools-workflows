@@ -1,0 +1,177 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gh runner release
+
+# description:
+
+on:
+  workflow_call:
+
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: 1password vault services account token
+        required: false
+
+    inputs:
+
+      registry:
+        description: oci compatible registry
+        required: false
+        type: string
+        default: docker.io
+
+      bake-file:
+        description: Name of docker bake json file. Default is docker-bake.json.
+        required: false
+        type: string
+        default: "docker-bake.json"
+      commit-tag:
+        description: value for tag
+        required: false
+        type: string
+        default: ""
+      target:
+        description: bake file target to build. Default is runner.
+        required: false
+        type: string
+        default: "runners"
+      release-tag:
+        description: Value for an additional release tag.
+        required: false
+        type: string
+        default: ""
+      include-latest:
+        description: Include latest tag in release. Default is false.
+        required: false
+        type: string
+        default: "false"
+
+      sign-manifest:
+        description: Sign release images manifest. Default is false.
+        required: false
+        type: string
+        default: "false"
+      cosign-sign-key:
+        description: Path to private key used to sign image. Default is ./cosign.key
+        required: false
+        type: string
+        default: cosign.key
+      cosign-verify-key:
+        description: Path to public key used to verify signature. Default is ./cosign.pub
+        required: false
+        type: string
+        default: cosign.pub
+
+      op-version:
+        description: install 1password-cli version
+        required: false
+        type: string
+        default: ""
+      teller-version:
+        description: install teller version
+        required: false
+        type: string
+        default: ""
+      vault-version:
+        description: install vault version
+        required: false
+        type: string
+        default: ""
+      scout-version:
+        description: install docker scout version
+        required: false
+        type: string
+        default: ""
+      oras-version:
+        description: install oras version
+        required: false
+        type: string
+        default: ""
+
+      after-checkout:
+        description: optionally call ./.github/actions/after-checkout after code checkout
+        required: false
+        type: string
+        default: "false"
+
+      before-release:
+        description: optionally call ./.github/actions/before-release before docker release
+        required: false
+        type: string
+        default: "false"
+
+      after-release:
+        description: optionally call ./.github/actions/after-release after docker release
+        required: false
+        type: string
+        default: "false"
+
+      builder-image-version:
+        description: default is latest
+        type: string
+        required: false
+        default: "twdps/gha-container-builder:latest"
+
+jobs:
+
+  runner-dev-release:
+    name: runner release workflow
+    runs-on: ubuntu-latest
+    # container: ${{ inputs.builder-image-version }}
+
+    env:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: run custom after-checkout action
+        if: ${{ inputs.after-checkout != 'false' }}
+        uses: ./.github/actions/after-checkout
+        with:
+          flag: ${{ inputs.after-checkout }}
+
+      - name: install dev-release dependencies
+        uses: twplatformlabs/gha-tools-actions/install@main
+        with:
+          op-version: ${{ inputs.op-version }}
+          teller-version: ${{ inputs.teller-version }}
+          vault-version: ${{ inputs.vault-version }}
+          oras-version: ${{ inputs.oras-version }}
+
+      - name: run custom before-release action
+        if: ${{ inputs.before-release != 'false' }}
+        uses: ./.github/actions/before-release
+        with:
+          flag: ${{ inputs.before-release }}
+
+      - name: confirm registry credentials and access
+        uses: twplatformlabs/gha-tools-actions/confirm-registry@main
+        with:
+          registry: ${{ inputs.registry }}
+
+      - name: Tag image manifest for release
+        uses: twplatformlabs/gha-tools-actions/tagx@main
+        with:
+          bake-file: ${{ inputs.bake-file }}
+          commit-tag: ${{ inputs.commit-tag }}
+          target: ${{ inputs.target }}
+          release-tag: ${{ inputs.release-tag }}
+          include-latest: ${{ inputs.include-latest }}
+
+      - name: Sign image manifest
+        if: ${{ inputs.sign-manifest != 'false' }}
+        uses: twplatformlabs/gha-tools-actions/sign-manifest@main
+        with:
+          bake-file: ${{ inputs.bake-file }}
+          release-tag: ${{ inputs.release-tag }}
+          cosign-sign-key: ${{ inputs.cosign-sign-key }}
+          cosign-verify-key: ${{ inputs.cosign-verify-key }}
+
+      - name: run custom after-release action
+        if: ${{ inputs.after-release != 'false' }}
+        uses: ./.github/actions/after-release
+        with:
+          flag: ${{ inputs.after-release }}
