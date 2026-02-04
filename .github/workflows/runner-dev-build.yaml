@@ -191,7 +191,7 @@ on:
         default: "twdps/gha-container-builder:latest"
 
 permissions:
-  contents: read
+  contents: write
   actions: read
   security-events: write
 
