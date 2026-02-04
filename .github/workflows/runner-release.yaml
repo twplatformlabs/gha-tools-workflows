@@ -88,6 +88,11 @@ on:
         required: false
         type: string
         default: ""
+      cosign-version:
+        description: Install Cosign version
+        required: false
+        type: string
+        default: ""
 
       after-checkout:
         description: optionally call ./.github/actions/after-checkout after code checkout
@@ -143,6 +148,7 @@ jobs:
           teller-version: ${{ inputs.teller-version }}
           vault-version: ${{ inputs.vault-version }}
           oras-version: ${{ inputs.oras-version }}
+          cosign-version: ${{ inputs.cosign-version }}
 
       - name: run custom before-release action
         if: ${{ inputs.before-release != 'false' }}
