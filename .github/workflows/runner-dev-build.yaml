@@ -190,6 +190,11 @@ on:
         required: false
         default: "twdps/gha-container-builder:latest"
 
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
 jobs:
 
   runner-dev-build:
