@@ -132,6 +132,17 @@ on:
         type: string
         default: test
 
+      snyk-scan:
+        description: perform snyk scan
+        required: false
+        type: string
+        default: false
+      snyk-version:
+        description: install snyk version
+        required: false
+        type: string
+        default: ""
+
       op-version:
         description: install 1password-cli version
         required: false
@@ -152,48 +163,6 @@ on:
 
       scout-version:
         description: install docker scout version
-        required: false
-        type: string
-        default: ""
-
-      snyk-scan:
-        description: perform snyk scan
-        required: false
-        type: string
-        default: false
-
-      snyk-version:
-        description: install snyk version
-        required: false
-        type: string
-        default: ""
-
-      snyk-severity-threshold:
-        description: snyk test reporting threshold
-        required: false
-        type: string
-        default: low
-
-      snyk-token:
-        description: snyk api-token
-        required: false
-        type: string
-        default: $SNYK_TOKEN
-
-      snyk-organization:
-        description: name of snyk organization
-        required: false
-        type: string
-        default: ""
-
-      snyk-skip-base-image:
-        description: skip performing cve scan of base image
-        required: false
-        type: string
-        default: "false"
-
-      snyk-additional-args:
-        description: additional custom command line flags
         required: false
         type: string
         default: ""
@@ -275,7 +244,6 @@ jobs:
           # vault-version: ${{ inputs.vault-version }}
           # snyk-version: ${{ inputs.snyk-version }}
           # bats-version: ${{ inputs.bats-version }}
-          # hadolint-version: ${{ inputs.hadolint-version }}
           # trivy-version: ${{ inputs.trivy-version }}
           # grype-version: ${{ inputs.grype-version }}
 
@@ -329,23 +297,13 @@ jobs:
           tag: ${{ inputs.tag}}
           target: ${{ inputs.target }}
 
-      # - name: perform snyk cve scan
-      #   if: ${{ inputs.snyk-scan == 'true' }}
-      #   uses: twplatformlabs/gha-tools-action/snyk-scan@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     registry: ${{ inputs.registry}}
-      #     organization: ${{ inputs.organization }}
-      #     image: ${{ inputs.image }}
-      #     tag: ${{ inputs.tag-annotation }}${{ inputs.tag }}
-      #     dockerfile: ${{ inputs.dockerfile }}
-      #     path: ${{ inputs.path }}
-      #     snyk-severity-threshold: ${{ inputs.snyk-severity-threshold }}
-      #     snyk-organization: ${{ inputs.snyk-organization }}
-      #     snyk-token: ${{ inputs.snyk-token }}
-      #     snyk-skip-base-image: ${{ inputs.snyk-skip-base-image }}
-      #     snyk-additional-args: ${{ inputs.snyk-additional-args }}
-      #     security-scan-nofail: ${{ inputs.security-scan-nofail }}
+      - name: perform snyk cve scan
+        if: ${{ inputs.snyk-scan == 'true' }}
+        uses: twplatformlabs/gha-tools-actions/snyk-scan@main
+        with:
+          bake-file: ${{ inputs.bake-file }}
+          tag: ${{ inputs.tag}}
+          target: ${{ inputs.target }}
 
       # - name: perform trivy image scan
       #   if: ${{ inputs.trivy-scan == 'true' }}
