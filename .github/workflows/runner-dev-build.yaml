@@ -11,6 +11,8 @@ name: gh runner dev build
 #   hadolint/hadolint-action
 #   twplatformlabs/gha-tools-actions/buildx (using bake file confiuration)
 #   twplatformlabs/gha-tools-actions/scout-scan (Docker Scout cve scan)
+#   (Optional) twplatformlabs/gha-tools-actions/snyk-scan
+#   (Optional) twplatformlabs/gha-tools-actions/bats (Runtime configuration testing option)
 #   ossf/scorecard-action
 #
 # Use before-build local Action to setup ENV values,
@@ -148,19 +150,16 @@ on:
         required: false
         type: string
         default: ""
-
       teller-version:
         description: install teller version
         required: false
         type: string
         default: ""
-
       vault-version:
         description: install vault version
         required: false
         type: string
         default: ""
-
       scout-version:
         description: install docker scout version
         required: false
@@ -219,7 +218,7 @@ jobs:
           vault-version: ${{ inputs.vault-version }}
           scout-version: ${{ inputs.scout-version }}
           snyk-version: ${{ inputs.snyk-version }}
-          # bats-version: ${{ inputs.bats-version }}
+          bats-version: ${{ inputs.bats-version }}
 
       - name: run custom before-build action
         if: ${{ inputs.before-build != 'false' }}
@@ -254,26 +253,18 @@ jobs:
           target: ${{ inputs.target }}
           extra-build-args: ${{ inputs.extra-build-args }}
 
-      # - name: run bats test against running container
-      #   if: ${{ inputs.bats-test == 'true' }}
-      #   uses: twplatformlabs/gha-tools-actions/bats@main
-      #   with:
-      #     bake-file: ${{ inputs.bake-file }}
-      #     tag: ${{ inputs.tag}}
-      #     target: ${{ inputs.target }}
-      #     bats-entry-point: ${{ inputs.bats-entry-point }}
-      #     bats-test-path: ${{ inputs.bats-test-path }}
-
-      - name: cve scan container images from docker bake file
-        uses: twplatformlabs/gha-tools-actions/scout-scan@main
+      - name: run bats test against running container
+        if: ${{ inputs.bats-test == 'true' }}
+        uses: twplatformlabs/gha-tools-actions/bats@main
         with:
           bake-file: ${{ inputs.bake-file }}
           tag: ${{ inputs.tag}}
           target: ${{ inputs.target }}
+          bats-entry-point: ${{ inputs.bats-entry-point }}
+          bats-test-path: ${{ inputs.bats-test-path }}
 
-      - name: perform snyk cve scan
-        if: ${{ inputs.snyk-scan == 'true' }}
-        uses: twplatformlabs/gha-tools-actions/snyk-scan@main
+      - name: cve scan container images from docker bake file
+        uses: twplatformlabs/gha-tools-actions/scout-scan@main
         with:
           bake-file: ${{ inputs.bake-file }}
           tag: ${{ inputs.tag}}
