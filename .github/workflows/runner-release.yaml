@@ -52,6 +52,11 @@ on:
         required: false
         type: string
         default: "false"
+      cosign-version:
+        description: Install Cosign version
+        required: false
+        type: string
+        default: ""
       cosign-sign-key:
         description: Path to private key used to sign image. Default is ./cosign.key
         required: false
@@ -85,11 +90,6 @@ on:
         default: ""
       oras-version:
         description: install oras version
-        required: false
-        type: string
-        default: ""
-      cosign-version:
-        description: Install Cosign version
         required: false
         type: string
         default: ""
