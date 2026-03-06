@@ -15,7 +15,7 @@ name: gha runner development build
 #   (Optional) twplatformlabs/gha-tools-actions/bats (Runtime configuration testing option)
 #   ossf/scorecard-action
 #
-# 
+#
 # Use after-checkout local Action to setup ENV values as needed.
 # Many steps provide additional configuration parameters. See inputs below
 # for usage details and default settings. Additional step details are available

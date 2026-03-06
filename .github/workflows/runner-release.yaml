@@ -12,7 +12,7 @@ name: gh runner release
 #   twplatformlabs/gha-tools-actions/tagx (add semantic tag to development build based on bake file configuration)
 #   (Optional) twplatformlabs/gha-tools-actions/sign-manifest (sign manifest using cosign)
 #
-# 
+#
 # Use after-checkout local Action to setup ENV values as needed.
 # Many steps provide additional configuration parameters. See inputs below
 # for usage details and default settings. Additional step details are available
