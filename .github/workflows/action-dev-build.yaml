@@ -145,6 +145,12 @@ on:
         type: string
         default: "false"
 
+      builder-image-version:
+        description: default is latest
+        type: string
+        required: false
+        default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
+
 permissions:
   contents: read
   actions: read
@@ -155,6 +161,7 @@ jobs:
   action-dev-build:
     name: gh action static code analysis
     runs-on: ubuntu-latest
+    container: ${{ inputs.builder-image-version }}
 
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -187,13 +194,13 @@ jobs:
           no_warnings: ${{ inputs.yamllint-no-warnings }}
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@5d4e8d1aca955e8d8589aabd499c5cae939e33c7  # v4.31.9
+        uses: github/codeql-action/init@v4.32.6            # 5d4e8d1aca955e8d8589aabd499c5cae939e33c7  # v4.31.9
         with:
           languages: "actions"
           queries: +security-and-quality
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@5d4e8d1aca955e8d8589aabd499c5cae939e33c7  # v4.31.9
+        uses: github/codeql-action/analyze@v4.32.6            # 5d4e8d1aca955e8d8589aabd499c5cae939e33c7  # v4.31.9
         with:
           category: "/language:actions"
 

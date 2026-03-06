@@ -116,7 +116,7 @@ on:
         description: default is latest
         type: string
         required: false
-        default: "twdps/gha-container-builder:latest"
+        default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
 
 permissions:
   contents: write
@@ -126,7 +126,7 @@ jobs:
   runner-dev-release:
     name: runner release workflow
     runs-on: ubuntu-latest
-    # container: ${{ inputs.builder-image-version }}
+    container: ${{ inputs.builder-image-version }}
 
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
