@@ -145,12 +145,6 @@ on:
         type: string
         default: "false"
 
-      builder-image-version:
-        description: default is latest
-        type: string
-        required: false
-        default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
-
 permissions:
   contents: read
   actions: read
@@ -161,7 +155,6 @@ jobs:
   action-dev-build:
     name: gh action static code analysis
     runs-on: ubuntu-latest
-    container: ${{ inputs.builder-image-version }}
 
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
