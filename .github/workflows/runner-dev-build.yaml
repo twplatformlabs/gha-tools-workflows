@@ -192,7 +192,7 @@ on:
         description: default is latest
         type: string
         required: false
-        default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
+        default: "ghcr.io/twplatformlabs/gha-tools-runner:dev.27eab2f"
 
 permissions:
   contents: write
