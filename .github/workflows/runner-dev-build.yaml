@@ -57,7 +57,7 @@ on:
         type: string
         default: "false"
       hadolint-failure-threshold:
-        description: Reporting error level. Default is info (error, warning, style, ignore) 
+        description: Reporting error level. Default is info (error, warning, style, ignore)
         required: false
         type: string
         default: "info"
