@@ -33,7 +33,7 @@ on:
     inputs:
 
       registry:
-        description: oci compatible registry
+        description: OCI compatible registry. Default is docker.io.
         required: false
         type: string
         default: docker.io
@@ -44,17 +44,17 @@ on:
         type: string
         default: "docker-bake.json"
       commit-tag:
-        description: value for tag
+        description: Value for development build tag. Default is dev.${GITHUB_SHA:0:7}.
         required: false
         type: string
         default: ""
       target:
-        description: bake file target to build. Default is runner.
+        description: Bake file targets to build. Default is runner.
         required: false
         type: string
         default: "runners"
       release-tag:
-        description: Value for an additional release tag.
+        description: Value for release tag. Default is git tag ($GITHUB_REF_NAME).
         required: false
         type: string
         default: ""
@@ -70,7 +70,7 @@ on:
         type: string
         default: "false"
       cosign-version:
-        description: Install Cosign version
+        description: Install Cosign version. Default is skip.
         required: false
         type: string
         default: ""
@@ -86,49 +86,49 @@ on:
         default: cosign.pub
 
       op-version:
-        description: install 1password-cli version
+        description: Install 1password-cli version. Default is skip.
         required: false
         type: string
         default: ""
       teller-version:
-        description: install teller version
+        description: Install teller version. Default is skip.
         required: false
         type: string
         default: ""
       vault-version:
-        description: install vault version
+        description: Install vault version. Default is skip.
         required: false
         type: string
         default: ""
       scout-version:
-        description: install docker scout version
+        description: Install docker scout version. Default is skip.
         required: false
         type: string
         default: ""
       oras-version:
-        description: install oras version
+        description: Install oras version. Default is skip.
         required: false
         type: string
         default: ""
 
       after-checkout:
-        description: optionally call ./.github/actions/after-checkout after code checkout
+        description: Optionally call ./.github/actions/after-checkout after code checkout. Default is skip.
         required: false
         type: string
         default: "false"
       before-release:
-        description: optionally call ./.github/actions/before-release before docker release
+        description: Optionally call ./.github/actions/before-release before docker release. Default is skip.
         required: false
         type: string
         default: "false"
       after-release:
-        description: optionally call ./.github/actions/after-release after docker release
+        description: Optionally call ./.github/actions/after-release after docker release. Default is skip.
         required: false
         type: string
         default: "false"
 
       builder-image-version:
-        description: default is latest
+        description: Define custom workflow runner image. Default is ghcr.io/twplatformlabs/gha-tools-runner:latest.
         type: string
         required: false
         default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
@@ -176,7 +176,7 @@ jobs:
         with:
           registry: ${{ inputs.registry }}
 
-      - name: Tag image manifest for release
+      - name: Tag image manifest for release based on bake file targets
         uses: twplatformlabs/gha-tools-actions/tagx@main
         with:
           bake-file: ${{ inputs.bake-file }}
@@ -185,7 +185,7 @@ jobs:
           release-tag: ${{ inputs.release-tag }}
           include-latest: ${{ inputs.include-latest }}
 
-      - name: Sign image manifest
+      - name: Sign image manifest based on bake file targets
         if: ${{ inputs.sign-manifest != 'false' }}
         uses: twplatformlabs/gha-tools-actions/sign-manifest@main
         with:

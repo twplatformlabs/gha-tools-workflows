@@ -16,7 +16,7 @@ Used for the SDLC management of shared GitHub Actions and Workflows. Workflows a
 
 ### action-dev-build.yaml
 
-A continuous-integration workflow triggered on every commit pushed.  
+A continuous-integration workflow for GitHub Actions triggered on every commit pushed.  
 
 Uses the following tools to provide feedback and quality controls:  
 - ibiqlik/action-yamllint
@@ -27,9 +27,6 @@ Uses the following tools to provide feedback and quality controls:
 Example usage:  
 github.com/twplatformlabs/common-actions/.github/workflows/dev-build.yaml
 ```yaml
-# yamllint disable rule:line-length
-# yamllint disable rule:truthy
----
 name: common-actions development build
 
 on:
@@ -69,9 +66,6 @@ Typically, Actions are released by tagging the desired commit with a semantic re
 Example usage:  
 github.com/twplatformlabs/common-actions/.github/workflows/release.yaml
 ```yaml
-# yamllint disable rule:line-length
-# yamllint disable rule:truthy
----
 name: common-actions release
 
 on:
@@ -97,6 +91,62 @@ jobs:
       before-release: "true"
       release-generate-notes: "true"
       release-chat-annoucement: "New release of twplatformlabs/common-actions"
+```
+
+### runner-dev-build.yaml and runner-release.yaml
+
+A continuous-integration workflow for custom GitHub Action Runners triggered on every commit pushed.  
+
+Uses the following tools to provide feedback and quality controls:  
+- hadolint/hadolint-action
+- twplatformlabs/gha-tools-actions/buildx (performs bake file build, enabling basic bill of materials and provenance generation)
+- (Optional) twplatformlabs/gha-tools-actions/bats (run custom Bats tests against running instances of each bake file target build)
+- (Optional) twplatformlabs/gha-tools-actions/scout-scan (Perform Docker Scout CVE scan on bake file targets)
+
+Example usage: Combines both workflows in a single definition. Could be separately triggered definitions.  
+
+github.com/twplatformlabs/runner-base-image/.github/workflows/development-build-and-release.yaml
+```yaml
+name: runner-base-image development build and release
+
+on:
+  push:
+    branches:   # triggers on either push or tag
+      - "*"
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+  actions: read
+  security-events: write
+
+jobs:
+
+  runner-dev-build:
+    name: runner-base-image development build
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/runner-dev-build.yaml@main
+    with:
+      before-build: "true"
+      registry: ghcr.io
+      skip-hadolint: "false"
+      bats-test: "true"
+      bats-test-path: "test/runner-base-image.bats"
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+  release:
+    name: runner-base-image release
+    if: startsWith(github.ref, 'refs/tags/')   # only runs if triggered by tag and dev build succeeds
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/runner-release.yaml@main
+    needs: runner-dev-build
+    with:
+      before-release: "true"
+      registry: ghcr.io
+      include-latest: "true"
+      sign-manifest: "true"
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 ```
 
 ### ossf-scorecard.yaml

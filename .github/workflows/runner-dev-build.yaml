@@ -11,7 +11,6 @@ name: gha runner development build
 #   hadolint/hadolint-action
 #   twplatformlabs/gha-tools-actions/buildx (using bake file for build configuration)
 #   twplatformlabs/gha-tools-actions/scout-scan (Docker Scout cve scan)
-#   (Optional) twplatformlabs/gha-tools-actions/snyk-scan
 #   (Optional) twplatformlabs/gha-tools-actions/bats (Runtime configuration testing option)
 #   ossf/scorecard-action
 #
@@ -36,19 +35,19 @@ on:
     inputs:
 
       registry:
-        description: oci compatible registry
+        description: OCI compatible registry. Default is docker.io.
         required: false
         type: string
         default: docker.io
 
       dockerfile:
-        description: path to the directory containing your Dockerfile(s)
+        description: Path to the directory containing your Dockerfile(s).
         required: false
         type: string
         default: "./Dockerfile"
 
       skip-hadolint:
-        description: skip hadolint scan. Default is false.
+        description: Skip hadolint scan. Default is false.
         required: false
         type: string
         default: "false"
@@ -58,7 +57,7 @@ on:
         type: string
         default: ""
       hadolint-verbose:
-        description: verbose output. Default is false.
+        description: Verbose output. Default is false.
         required: false
         type: string
         default: "false"
@@ -68,27 +67,27 @@ on:
         type: string
         default: "info"
       hadolint-format:
-        description: hadolint output format. Default is tty.
+        description: Hadolint output format. Default is tty.
         required: false
         type: string
         default: "tty"
       hadolint-output-file:
-        description: pipe output to file. Default is /dev/stdout.
+        description: Pipe output to file. Default is /dev/stdout.
         required: false
         type: string
         default: "/dev/stdout"
       hadolint-ignore:
-        description: comma delimited list of Hadolint rules to ignore.
+        description: Comma delimited list of Hadolint rules to ignore.
         required: false
         type: string
         default: ""
       hadolint-no-fail:
-        description: don't fail on errors. Default is false.
+        description: Don't fail on errors. Default is false.
         required: false
         type: string
         default: "false"
       hadolint-trusted-registries:
-        description: comma delimited list of trusted registries.
+        description: Comma delimited list of trusted registries.
         required: false
         type: string
         default: ""
@@ -99,12 +98,12 @@ on:
         type: string
         default: "docker-bake.json"
       tag:
-        description: value for tag
+        description: Value for development build tag. Default is dev.${GITHUB_SHA:0:7}.
         required: false
         type: string
         default: ""
       target:
-        description: bake file target to build. Default is runner.
+        description: Bake file target to build. Default is runner.
         required: false
         type: string
         default: "runners"
@@ -115,81 +114,76 @@ on:
         default: ""
 
       bats-test:
-        description: run bats test against container
+        description: Run bats test against container. Default is false.
         required: false
         type: string
         default: false
       bats-version:
-        description: install bats version
+        description: Install bats version. Default is skip.
         required: false
         type: string
         default: ""
       bats-run-container-name:
-        description: name for running container
+        description: Name for running container. Default is container-test.
         required: false
         type: string
         default: container-test
       bats-entry-point:
-        description: name of shell ( bash | ash | etc )
+        description: Name of shell ( bash | ash | etc ). Default is /bin/bash.
         required: false
         type: string
         default: /bin/bash
       bats-test-path:
-        description: name of folder with bats tests
+        description: Name of folder with bats tests. Default is test.
         required: false
         type: string
         default: test
 
-      snyk-scan:
-        description: perform snyk scan
+      skip-cve-scan:
+        description: Skip Docker Scout cve scan. Default is false.
         required: false
         type: string
         default: false
-      snyk-version:
-        description: install snyk version
-        required: false
-        type: string
-        default: ""
 
       op-version:
-        description: install 1password-cli version
+        description: Install 1password-cli version. Default is skip.
         required: false
         type: string
         default: ""
       teller-version:
-        description: install teller version
+        description: Install teller version. Default is skip.
         required: false
         type: string
         default: ""
       vault-version:
-        description: install vault version
+        description: Install vault version. Default is skip.
         required: false
         type: string
         default: ""
       scout-version:
-        description: install docker scout version
+        description: Install docker scout version. Default is skip.
         required: false
         type: string
         default: ""
 
       after-checkout:
-        description: optionally call ./.github/actions/after-checkout after code checkout
+        description: Optionally call ./.github/actions/after-checkout after code checkout. Default is skip.
         required: false
         type: string
         default: "false"
       before-build:
-        description: optionally call ./.github/actions/before-build before docker build
+        description: Optionally call ./.github/actions/before-build before docker build. Default is skip.
         required: false
         type: string
         default: "false"
       after-build:
-        description: optionally call ./.github/actions/after-build after docker build
+        description: Optionally call ./.github/actions/after-build after docker build. Default is skip.
         required: false
         type: string
         default: "false"
 
       builder-image-version:
-        description: default is latest
+        description: Define custom workflow runner image. Default is ghcr.io/twplatformlabs/gha-tools-runner:latest.
         type: string
         required: false
         default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
@@ -254,7 +248,7 @@ jobs:
         with:
           registry: ${{ inputs.registry }}
 
-      - name: build container images from docker bake file
+      - name: build container images from docker bake file targets
         uses: twplatformlabs/gha-tools-actions/buildx@main
         with:
           bake-file: ${{ inputs.bake-file }}
@@ -262,7 +256,7 @@ jobs:
           target: ${{ inputs.target }}
           extra-build-args: ${{ inputs.extra-build-args }}
 
-      - name: run bats test against running container
+      - name: run bats test against running container, based on bake file targets
         if: ${{ inputs.bats-test == 'true' }}
         uses: twplatformlabs/gha-tools-actions/bats@main
         with:
@@ -272,7 +266,8 @@ jobs:
           bats-entry-point: ${{ inputs.bats-entry-point }}
           bats-test-path: ${{ inputs.bats-test-path }}
 
-      - name: cve scan container images from docker bake file
+      - name: cve scan container images from docker bake file targets
+        if: ${{ inputs.skip-cve-scan != 'true' }}
         uses: twplatformlabs/gha-tools-actions/scout-scan@main
         with:
           bake-file: ${{ inputs.bake-file }}
