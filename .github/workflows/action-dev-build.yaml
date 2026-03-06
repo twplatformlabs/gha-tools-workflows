@@ -13,7 +13,12 @@ name: gh action development build
 #   github/codeql-action
 #   ossf/scorecard-action
 #
-# See inputs below for optional configuration parameters
+# Many steps provide additional configuration parameters. See inputs below
+# for usage details and default settings.
+# Includes Action hooks at:
+# - after-checkout
+# - before-build
+# - after-build
 
 on:
   workflow_call:

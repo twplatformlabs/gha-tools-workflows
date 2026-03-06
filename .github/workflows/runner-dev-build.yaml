@@ -1,23 +1,29 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:truthy
 ---
-name: gh runner dev build
+name: gha runner development build
 
 # description:
 #
-# Performs the common development CI lifecycle steps for building pre-configured GitHub Action runners.
+# Performs the development CI lifecycle steps for building pre-configured GitHub Action runners.
 #
 # Uses:
 #   hadolint/hadolint-action
-#   twplatformlabs/gha-tools-actions/buildx (using bake file confiuration)
+#   twplatformlabs/gha-tools-actions/buildx (using bake file for build configuration)
 #   twplatformlabs/gha-tools-actions/scout-scan (Docker Scout cve scan)
 #   (Optional) twplatformlabs/gha-tools-actions/snyk-scan
 #   (Optional) twplatformlabs/gha-tools-actions/bats (Runtime configuration testing option)
 #   ossf/scorecard-action
 #
-# Use before-build local Action to setup ENV values,
-# both pulled from a secrets store and for use in bake file.
-# See inputs below for optional configuration parameters
+# 
+# Use after-checkout local Action to setup ENV values as needed.
+# Many steps provide additional configuration parameters. See inputs below
+# for usage details and default settings. Additional step details are available
+# in the associated twplatformlabs/gha-tools-actions repository.
+# Includes Action hooks at:
+# - after-checkout
+# - before-build
+# - after-build
 
 on:
   workflow_call:
@@ -171,13 +177,11 @@ on:
         required: false
         type: string
         default: "false"
-
       before-build:
         description: optionally call ./.github/actions/before-build before docker build
         required: false
         type: string
         default: "false"
-
       after-build:
         description: optionally call ./.github/actions/after-build after docker build
         required: false

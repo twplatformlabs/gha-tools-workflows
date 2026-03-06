@@ -4,6 +4,23 @@
 name: gh runner release
 
 # description:
+#
+# Combine the runner-release workflow with an 'on tag' trigger to perform semantic releases of gha runners.
+#
+# Uses:
+#   (Optional) twplatformlabs/gha-tools-actions/install (install package dependencies when pre-configured runner not used)
+#   twplatformlabs/gha-tools-actions/tagx (add semantic tag to development build based on bake file configuration)
+#   (Optional) twplatformlabs/gha-tools-actions/sign-manifest (sign manifest using cosign)
+#
+# 
+# Use after-checkout local Action to setup ENV values as needed.
+# Many steps provide additional configuration parameters. See inputs below
+# for usage details and default settings. Additional step details are available
+# in the associated twplatformlabs/gha-tools-actions repository.
+# Includes Action hooks at:
+# - after-checkout
+# - before-release
+# - after-release
 
 on:
   workflow_call:
@@ -99,13 +116,11 @@ on:
         required: false
         type: string
         default: "false"
-
       before-release:
         description: optionally call ./.github/actions/before-release before docker release
         required: false
         type: string
         default: "false"
-
       after-release:
         description: optionally call ./.github/actions/after-release after docker release
         required: false

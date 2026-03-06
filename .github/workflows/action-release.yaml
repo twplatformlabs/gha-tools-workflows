@@ -5,10 +5,17 @@ name: gh action release version
 
 # description:
 #
-# Create a GitHub release based on applying a semantic tag and
-# optionally posts an announcement on a Slack channel.
+# Combine the action-release workflow with an 'on tag' trigger to perform semantic releases of shared gha actions and workflows.
 #
-# See inputs below for optional configuration parameters
+# uses:
+#   twplatformlabs/common-actions/gh-release-create (create release using github-cli)
+#   (Optional) twplatformlabs/common-actions/slack-bot (post release notifications to slack)
+#
+# Many steps provide additional configuration parameters. See inputs below
+# for usage details and default settings.
+# Includes Action hooks at:
+# - before-release
+# - after-release
 
 on:
   workflow_call:

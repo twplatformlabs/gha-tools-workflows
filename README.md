@@ -12,7 +12,7 @@ Shared workflows for building and maintaining GitHub Actions, Workflows, and Run
 
 ## Workflows
 
-Used for the SDLC management of shared GitHub Actions and Workflows.  
+Used for the SDLC management of shared GitHub Actions and Workflows. Workflows also demonstrate integrated support for secrets management using 1password which can be adapted to most centralized solutions.  
 
 ### action-dev-build.yaml
 
@@ -25,7 +25,6 @@ Uses the following tools to provide feedback and quality controls:
 - ossf/scorecard-action _confirmation_
 
 Example usage:  
-
 github.com/twplatformlabs/common-actions/.github/workflows/dev-build.yaml
 ```yaml
 # yamllint disable rule:line-length
