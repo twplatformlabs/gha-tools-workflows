@@ -1,0 +1,96 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gh automated recurring runner release
+
+# description:
+#
+# Set a monthly cron schedule to tag the runner repository for an automated monthly build with current release packages.
+#
+# Uses:
+#   (Optional) twplatformlabs/gha-tools-actions/install (install package dependencies when pre-configured runner not used)
+#   twplatformlabs/gha-tools-actions/tagx (add semantic tag to development build based on bake file configuration)
+#   (Optional) twplatformlabs/gha-tools-actions/sign-manifest (sign manifest using cosign)
+#
+#
+# Use after-checkout local Action to setup ENV values as needed.
+# Many steps provide additional configuration parameters. See inputs below
+# for usage details and default settings. Additional step details are available
+# in the associated twplatformlabs/gha-tools-actions repository.
+# Includes Action hooks at:
+# - after-checkout
+# - before-release
+# - after-release
+
+on:
+  workflow_call:
+
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: 1password vault services account token
+        required: false
+
+    inputs:
+
+      committer-name:
+        description: Committer name.
+        required: false
+        type: string
+        default: ""
+      committer-email:
+        description: Committer email.
+        required: false
+        type: string
+        default: ""
+
+      before-release:
+        description: Optionally call ./.github/actions/before-release before docker release. Default is skip.
+        required: false
+        type: string
+        default: "false"
+      after-release:
+        description: Optionally call ./.github/actions/after-release after docker release. Default is skip.
+        required: false
+        type: string
+        default: "false"
+
+      builder-image-version:
+        description: Define custom workflow runner image. Default is ghcr.io/twplatformlabs/gha-tools-runner:latest.
+        type: string
+        required: false
+        default: "ghcr.io/twplatformlabs/gha-tools-runner:latest"
+
+permissions:
+  contents: write
+
+jobs:
+
+  runner-dev-release:
+    name: runner release workflow
+    runs-on: ubuntu-latest
+    container: ${{ inputs.builder-image-version }}
+
+    env:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: run custom before-release action
+        if: ${{ inputs.before-release != 'false' }}
+        uses: ./.github/actions/before-release
+        with:
+          flag: ${{ inputs.before-release }}
+
+      - name: tag repository for automated release
+        uses: twplatformlabs/gha-tools-actions/tag-registry@main
+        with:
+          committer-name: ${{ inputs.committer-name }}
+          committer-email: ${{ inputs.committer-email }}
+
+      - name: run custom after-release action
+        if: ${{ inputs.after-release != 'false' }}
+        uses: ./.github/actions/after-release
+        with:
+          flag: ${{ inputs.after-release }}
