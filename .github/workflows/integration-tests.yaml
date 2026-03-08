@@ -12,7 +12,7 @@ on:
         required: false
 
 permissions:
-  contents: write
+  contents: read
   actions: read
   security-events: write
 
