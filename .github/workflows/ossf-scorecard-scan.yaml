@@ -7,17 +7,16 @@ run-name: Scorecard Scan
 on:
   workflow_call:
 
-permissions: read-all
+permissions: # read-all
+  contents: read
+  security-events: write
+  id-token: write
 
 jobs:
 
   ossf-scorecard-scan:
     name: ossf scorecard scan
     runs-on: ubuntu-latest
-
-    permissions:
-      security-events: write
-      id-token: write
 
     steps:
       - name: "Checkout code"
