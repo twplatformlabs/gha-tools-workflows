@@ -11,7 +11,7 @@ on:
       - "!*"
 
 permissions:
-  contents: read
+  contents: write
   actions: read
   security-events: write
 
