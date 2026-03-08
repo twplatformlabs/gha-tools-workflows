@@ -1,0 +1,44 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: OSSF Scorecard analysis workflow
+run-name: Scorecard Scan
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
+jobs:
+
+  ossf-scorecard-scan:
+    name: ossf scorecard scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: "Run analysis"
+        uses: ossf/scorecard-action@v2.4.3
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v7
+        with:
+          name: SARIF file
+          path: results.sarif
+          retention-days: 30
+
+      - name: "Upload to code-scanning"
+        uses: github/codeql-action/upload-sarif@v4.32.6
+        with:
+          sarif_file: results.sarif
