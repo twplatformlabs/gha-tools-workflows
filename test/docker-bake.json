@@ -1,0 +1,49 @@
+{
+  "variable": {
+    "CREATED": { "default": "" },
+    "REVISION": { "default": "" },
+    "ALPINE_BASE": { "default": "" },
+    "TAG": { "default": "" }
+  },
+
+  "group": {
+    "runner": {
+      "targets": ["alpine"]
+    }
+  },
+  "target": {
+    "_release": {
+      "labels": {
+        "org.opencontainers.image.created": "${CREATED}",
+        "org.opencontainers.image.authors": "nic.cheneweth@thoughtworks.com",
+        "org.opencontainers.image.revision": "${REVISION}",
+        "org.opencontainers.image.vendor": "ThoughtWorks, Inc.",
+        "org.opencontainers.image.licenses": "MIT"
+      },
+      "args": {
+        "BUILDKIT_CONTEXT_KEEP_GIT_DIR": "1",
+        "BUILDX_EXPERIMENTAL": "1",
+        "BUILDKIT_SBOM_SCAN_CONTEXT": "1"
+      },
+      "attest": [
+        "type=provenance,mode=max,version=v1",
+        "type=sbom"
+      ]
+    },
+    "alpine": {
+      "dockerfile": "test/Dockerfile",
+      "tags": ["ghcr.io/twplatformlabs/gha-tools-workflows-test:alpine-${TAG}"],
+      "context": ".",
+      "platforms": ["linux/amd64"],
+      "inherits": ["_release"],
+      "labels": {
+        "org.opencontainers.image.url": "https://github.com/twplatformlabs/gha-tools-workflows-test",
+        "org.opencontainers.image.documentation": "https://github.com/twplatformlabs/gha-tools-workflows-test",
+        "org.opencontainers.image.source": "https://github.com/twplatformlabs/gha-tools-workflows-test",
+        "org.opencontainers.image.title": "gha-tools-workflows-test",
+        "org.opencontainers.image.description": "test fixture for gha-tools-workflows",
+        "org.opencontainers.image.base.name": "${ALPINE_BASE}"
+      }
+    }
+  }
+}

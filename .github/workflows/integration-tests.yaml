@@ -1,0 +1,45 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: gha-tools-workflows integration tests
+
+on:
+  workflow_call:
+
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: 1password vault services account token
+        required: false
+
+permissions:
+  contents: write
+  actions: read
+  security-events: write
+
+jobs:
+
+  runner-dev-build-test:
+    name: gha-tools-workflows runner development build test
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/runner-dev-build.yaml@main
+    with:
+      before-build: "true"
+      bake-file: test/docker-bake.json
+      registry: ghcr.io
+      bats-test: "true"
+      bats-test-path: "test/test.bats"
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+  release:
+    name: gha-tools-workflows runner release test
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/runner-release.yaml@main
+    needs: runner-dev-build-test
+    with:
+      before-release: "true"
+      bake-file: test/docker-bake.json
+      registry: ghcr.io
+      release-tag: 0.0.0
+      include-latest: "true"
+      sign-manifest: "true"
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
