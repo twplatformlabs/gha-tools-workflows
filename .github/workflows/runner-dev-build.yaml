@@ -54,7 +54,7 @@ on:
         description: Bake file target to build. Default is runner.
         required: false
         type: string
-        default: "runners"
+        default: "runner"
       extra-build-args:
         description: Extra flags to pass to docker build
         required: false
