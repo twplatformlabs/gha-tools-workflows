@@ -197,7 +197,7 @@ jobs:
         if: ${{ inputs.skip-hadolint != 'true' }}
         uses: twplatformlabs/gha-tools-actions/hadolint@main
         with:
-          bakefile: ${{ inputs.bake-file }}
+          bake-file: ${{ inputs.bake-file }}
           format: ${{ inputs.hadolint-format }}
           failure-threshold: ${{ inputs.hadolint-failure-threshold }}
 
