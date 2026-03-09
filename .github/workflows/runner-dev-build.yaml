@@ -40,58 +40,6 @@ on:
         type: string
         default: docker.io
 
-      dockerfile:
-        description: Path to the directory containing your Dockerfile(s).
-        required: false
-        type: string
-        default: "./Dockerfile"
-
-      skip-hadolint:
-        description: Skip hadolint scan. Default is false.
-        required: false
-        type: string
-        default: "false"
-      hadolint-config:
-        description: Custom hadolint config file.
-        required: false
-        type: string
-        default: ""
-      hadolint-verbose:
-        description: Verbose output. Default is false.
-        required: false
-        type: string
-        default: "false"
-      hadolint-failure-threshold:
-        description: Reporting error level. Default is info (error, warning, style, ignore)
-        required: false
-        type: string
-        default: "info"
-      hadolint-format:
-        description: Hadolint output format. Default is tty.
-        required: false
-        type: string
-        default: "tty"
-      hadolint-output-file:
-        description: Pipe output to file. Default is /dev/stdout.
-        required: false
-        type: string
-        default: "/dev/stdout"
-      hadolint-ignore:
-        description: Comma delimited list of Hadolint rules to ignore.
-        required: false
-        type: string
-        default: ""
-      hadolint-no-fail:
-        description: Don't fail on errors. Default is false.
-        required: false
-        type: string
-        default: "false"
-      hadolint-trusted-registries:
-        description: Comma delimited list of trusted registries.
-        required: false
-        type: string
-        default: ""
-
       bake-file:
         description: Name of docker bake json file. Default is docker-bake.json.
         required: false
@@ -112,6 +60,22 @@ on:
         required: false
         type: string
         default: ""
+
+      skip-hadolint:
+        description: Skip hadolint scan. Default is false.
+        required: false
+        type: string
+        default: "false"
+      hadolint-failure-threshold:
+        description: Reporting error level. Default is info (error, warning, style, ignore)
+        required: false
+        type: string
+        default: "info"
+      hadolint-format:
+        description: Hadolint output format. Default is tty.
+        required: false
+        type: string
+        default: "tty"
 
       bats-test:
         description: Run bats test against container. Default is false.
@@ -231,17 +195,11 @@ jobs:
 
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: twplatformlabs/gha-tools-actions/hadolint@main
         with:
-          dockerfile: ${{ inputs.dockerfile }}
-          config: ${{ inputs.hadolint-config }}
-          verbose: ${{ inputs.hadolint-verbose }}
-          output-file: ${{ inputs.hadolint-output-file }}
+          bakefile: ${{ inputs.bake-file }}
           format: ${{ inputs.hadolint-format }}
           failure-threshold: ${{ inputs.hadolint-failure-threshold }}
-          no-fail: ${{ inputs.hadolint-no-fail }}
-          ignore: ${{ inputs.hadolint-ignore }}
-          trusted-registries: ${{ inputs.hadolint-trusted-registries }}
 
       - name: confirm registry credentials and access
         uses: twplatformlabs/gha-tools-actions/confirm-registry@main
