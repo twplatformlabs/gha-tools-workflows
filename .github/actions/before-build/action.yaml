@@ -15,6 +15,28 @@ runs:
 
   steps:
 
-    - name: test message
-      shell: bash
-      run: echo "run before-build action"
+    - name: load job credentials
+      uses: 1password/load-secrets-action@v3
+      with:
+        export-env: true
+      env:
+        DOCKER_LOGIN: op://platform/svc-dockerhub/username
+        DOCKER_PASSWORD: op://platform/svc-dockerhub/password
+
+    - name: perform dockerhub login
+      uses: twplatformlabs/gha-tools-actions/confirm-registry@main
+
+    - name: load job credentials
+      uses: 1password/load-secrets-action@v3
+      with:
+        export-env: true
+      env:
+        GH_TOKEN: op://platform/svc-github/access-token
+        DOCKER_LOGIN: op://platform/svc-github/username
+        DOCKER_PASSWORD: op://platform/svc-github/access-token
+        COSIGN_PASSWORD: op://platform/svc-cosign/passphrase
+
+    - name: perform ghcr login
+      uses: twplatformlabs/gha-tools-actions/confirm-registry@main
+      with:
+        registry: ghcr.io
