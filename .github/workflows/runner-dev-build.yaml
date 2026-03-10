@@ -178,7 +178,7 @@ jobs:
           flag: ${{ inputs.after-checkout }}
 
       - name: install dev-release dependencies
-        uses: twplatformlabs/gha-tools-actions/install@main
+        uses: twplatformlabs/gha-tools-actions/install@v1
         with:
           op-version: ${{ inputs.op-version }}
           teller-version: ${{ inputs.teller-version }}
@@ -195,19 +195,19 @@ jobs:
 
       - name: hadolint dockerfile
         if: ${{ inputs.skip-hadolint != 'true' }}
-        uses: twplatformlabs/gha-tools-actions/hadolint@main
+        uses: twplatformlabs/gha-tools-actions/hadolint@v1
         with:
           bake-file: ${{ inputs.bake-file }}
           format: ${{ inputs.hadolint-format }}
           failure-threshold: ${{ inputs.hadolint-failure-threshold }}
 
       - name: confirm registry credentials and access
-        uses: twplatformlabs/gha-tools-actions/confirm-registry@main
+        uses: twplatformlabs/gha-tools-actions/confirm-registry@v1
         with:
           registry: ${{ inputs.registry }}
 
       - name: build container images from docker bake file targets
-        uses: twplatformlabs/gha-tools-actions/buildx@main
+        uses: twplatformlabs/gha-tools-actions/buildx@v1
         with:
           bake-file: ${{ inputs.bake-file }}
           tag: ${{ inputs.tag}}
@@ -216,7 +216,7 @@ jobs:
 
       - name: run bats test against running container, based on bake file targets
         if: ${{ inputs.bats-test == 'true' }}
-        uses: twplatformlabs/gha-tools-actions/bats@main
+        uses: twplatformlabs/gha-tools-actions/bats@v1
         with:
           bake-file: ${{ inputs.bake-file }}
           tag: ${{ inputs.tag}}
@@ -226,7 +226,7 @@ jobs:
 
       - name: cve scan container images from docker bake file targets
         if: ${{ inputs.skip-cve-scan != 'true' }}
-        uses: twplatformlabs/gha-tools-actions/scout-scan@main
+        uses: twplatformlabs/gha-tools-actions/scout-scan@v1
         with:
           bake-file: ${{ inputs.bake-file }}
           tag: ${{ inputs.tag}}

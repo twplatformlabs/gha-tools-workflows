@@ -86,7 +86,7 @@ jobs:
           flag: ${{ inputs.before-release }}
 
       - name: tag repository for automated release
-        uses: twplatformlabs/gha-tools-actions/tag-repository@main
+        uses: twplatformlabs/gha-tools-actions/tag-repository@v1
         with:
           committer-name: ${{ inputs.committer-name }}
           committer-email: ${{ inputs.committer-email }}

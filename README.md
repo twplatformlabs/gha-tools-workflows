@@ -93,6 +93,42 @@ jobs:
       release-chat-annoucement: "New release of twplatformlabs/common-actions"
 ```
 
+### ossf-scorecard-scan.yaml
+
+The general GitHUb code security and scanning features are applied through the dev-build workflows, and those that aren't can be applied through the scorecard actions. Add the follow on demand, on-push, and recurring ossf scans to an Action, Workflow, or Runner repo using this workflow:  
+```yaml
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: OSSF Scorecard analysis workflow
+run-name: Scorecard Scan
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '30 1 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  ossf-scorecard:
+    name: scorecard scan
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/ossf-scorecard-scan.yaml@v1
+    permissions:
+      security-events: write
+      id-token: write
+      contents: read
+      actions: read
+
+```
+
+Like the codeql scan, the results of the ossf analysis are published to the repository `Security` tab in the `Code scanning` section. Review the [ossf-scorecard documentation](https://github.com/ossf/scorecard) for detailed usage information.  
+
 ### runner-dev-build.yaml and runner-release.yaml
 
 A continuous-integration workflow for custom GitHub Action Runners triggered on every commit pushed.  
@@ -149,10 +185,31 @@ jobs:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 ```
 
-### ossf-scorecard.yaml
+### runner-auto-release.yaml
 
-As described above, this workflow is currently used by simply copy/pasting the the yaml file into your custom Action repository.  
+The recurring automatic release workflow will automatically apply a year-month tag to the repo, triggering a release for runner pipeline that choose to adopt an automatic current release build.  
+```yaml
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+---
+name: monthly update release
 
-The workflow runs on commits and as a 30-day cron trigger.  
+on:
+  schedule:
+    - cron: '0 1 5 * *'  # monthly on the 5th
 
-Like the codeql scan, the results of the ossf analysis are published to the repository `Security` tab in the `Code scanning` section. Review the [ossf-scorecard documentation](https://github.com/ossf/scorecard) for detailed usage information.  
+permissions:
+  contents: write
+
+jobs:
+
+  trigger-monthly-release:
+    name: runner-base-image monthly release
+    uses: twplatformlabs/gha-tools-workflows/.github/workflows/runner-auto-release.yaml@v1
+    with:
+      committer-email: twplatformlabs@gmail.com
+      committer-name: twplatformlabs-sa
+      before-release: "true"
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+```

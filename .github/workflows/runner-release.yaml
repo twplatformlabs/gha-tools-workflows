@@ -157,7 +157,7 @@ jobs:
           flag: ${{ inputs.after-checkout }}
 
       - name: install dev-release dependencies
-        uses: twplatformlabs/gha-tools-actions/install@main
+        uses: twplatformlabs/gha-tools-actions/install@v1
         with:
           op-version: ${{ inputs.op-version }}
           teller-version: ${{ inputs.teller-version }}
@@ -172,12 +172,12 @@ jobs:
           flag: ${{ inputs.before-release }}
 
       - name: confirm registry credentials and access
-        uses: twplatformlabs/gha-tools-actions/confirm-registry@main
+        uses: twplatformlabs/gha-tools-actions/confirm-registry@v1
         with:
           registry: ${{ inputs.registry }}
 
       - name: Tag image manifest for release based on bake file targets
-        uses: twplatformlabs/gha-tools-actions/tagx@main
+        uses: twplatformlabs/gha-tools-actions/tagx@v1
         with:
           bake-file: ${{ inputs.bake-file }}
           commit-tag: ${{ inputs.commit-tag }}
@@ -187,7 +187,7 @@ jobs:
 
       - name: Sign image manifest based on bake file targets
         if: ${{ inputs.sign-manifest != 'false' }}
-        uses: twplatformlabs/gha-tools-actions/sign-manifest@main
+        uses: twplatformlabs/gha-tools-actions/sign-manifest@v1
         with:
           bake-file: ${{ inputs.bake-file }}
           release-tag: ${{ inputs.release-tag }}
