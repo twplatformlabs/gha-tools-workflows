@@ -6,7 +6,7 @@ description: test after-release action
 
 inputs:
   flag:
-    description: pass after-build value to action to be usable as a flag to customize action flow
+    description: pass after-release value to action to be usable as a flag to customize action flow
     required: false
     default: ""
 
@@ -15,23 +15,6 @@ runs:
 
   steps:
 
-    - name: load values from 1password
-      uses: 1password/load-secrets-action@v3
-      with:
-        export-env: true
-      env:
-        SLACK_BOT_TOKEN: op://platform/svc-slack/platform-slack-bot-token
-        GH_TOKEN: op://platform/svc-github/access-token
-        DOCKER_LOGIN: op://platform/svc-github/username
-        DOCKER_PASSWORD: op://platform/svc-github/access-token
-        COSIGN_PASSWORD: op://platform/svc-cosign/passphrase
-        APP_ID: op://platform/svc-github-apps/app-id
-        PRIVATE_KEY: op://platform/svc-github-apps/private-key
-
-    - name: Set signing key files
+    - name: test message
       shell: bash
-      run: |
-        echo "op://platform/svc-cosign-private-key/notesPlain" > cosign.key.tpl
-        echo "op://platform/svc-cosign-public-key/notesPlain" > cosign.pub.tpl
-        op inject -i cosign.key.tpl -o cosign.key
-        op inject -i cosign.pub.tpl -o cosign.pub
+      run: echo "run after-release action"
